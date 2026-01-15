@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="is">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veiðigjöld - Reiknivél</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Borrowing the "skemmtilegt" vibe */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 50%, #6366f1 100%);
+            /* Ocean vibe */
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #1f2937;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: backgroundMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 35px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Adjusted row for static list */
+        .row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: end;
+            border-bottom: 1px dashed #e5e7eb;
+            padding-bottom: 12px;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input,
+        select {
+            padding: 12px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+
+        .species-label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding-bottom: 8px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .add-btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Results Area */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 100%);
+            color: white;
+            border: none;
+        }
+
+        .result-card.value-card {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+        }
+
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .result-line.large {
+            font-size: 1.25rem;
+            font-weight: 800;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #e5e7eb;
+            color: #6b7280;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table td.num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        .data-table th.num {
+            text-align: right;
+        }
+
+        /* Toggles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #0ea5e9;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Advanced Fees */
+        .fee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .fee-item {
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .fee-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .fee-item input {
+            font-size: 0.9rem;
+            padding: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding-bottom: 16px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        .concert-comparison {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #e5e7eb;
+        }
+
+        .tooltip-icon {
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Highlight row if KG > 0 */
+        .row.active-row {
+            background-color: rgba(14, 165, 233, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            border-bottom: 1px solid transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🐟 Veiðigjöld — reiknivél</h1>
+        <p class="subtitle">Settu inn kg og sjáðu brúttó, frítekjumark og nettó.<br>Þetta er bara margföldun (með smá
+            lögfræði).</p>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="loadExample()">📋 Setja inn dæmi</button>
+            <button class="btn btn-secondary" onclick="clearAll()">🧹 Hreinsa</button>
+            <button class="btn btn-success" onclick="copyData()">💾 Afrita gögn</button>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">⚖️ Veiðitölur (kg)</h2>
+            </div>
+            <div id="catch-rows"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🧾 Gjaldtaxtar (kr/kg)</h2>
+                <button class="add-btn" style="margin:0; background:#6b7280; font-size:0.8em;" onclick="toggleFees()">⚙️
+                    Advanced</button>
+            </div>
+            <div id="fees-container" class="hidden">
+                <p style="font-size:0.9rem; color:#6b7280; margin-bottom:10px;">Breyttu gjaldtöxtum ef þú vilt
+                    (sjálfgefið 2026).</p>
+                <div class="fee-grid" id="fee-inputs"></div>
+            </div>
+            <div id="fees-summary" style="font-size:0.9rem; color:#6b7280;">
+                Miðað við 2026 taxta (óslægt). Smelltu á Advanced til að breyta.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📉 Frítekjumark / Afsláttur</h2>
+            </div>
+            <div class="toggle-container">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="allowance-toggle" checked onchange="calculate()">
+                    <span class="slider"></span>
+                </label>
+                <span style="font-weight: 600;">Reikna með frítekjumarki</span>
+            </div>
+            <p style="font-size: 0.95rem; color: #4b5563; line-height: 1.5;">
+                <strong>Þorskur & Ýsa:</strong> 65% afsláttur af fyrstu 15m kr. og 45% (af næstu 40m kr).<br>
+                <strong>Aðrar tegundir:</strong> 40% afsláttur af fyrstu 9m kr.<br>
+                <em>Gerir ráð fyrir að þetta sé eina veiði aðilans.</em>
+            </p>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">💸 Áætlað Söluverðmæti <span class="tooltip-icon"
+                        title="Miðað við verð í fyrstu sölu">ℹ️</span></h2>
+                <button class="add-btn" style="margin:0; background:#6b7280; font-size:0.8em;"
+                    onclick="togglePrices()">⚙️ Advanced</button>
+            </div>
+            <div id="prices-container" class="hidden">
+                <p style="font-size:0.9rem; color:#6b7280; margin-bottom:10px;">Sláðu inn áætlað verð (kr/kg) til að fá
+                    verðmætamats útreikning. (0 = ótalið).</p>
+                <div class="fee-grid" id="price-inputs"></div>
+            </div>
+            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 20px;">
+                Gróft viðmið (við fyrstu sölu). Verð er breytilegt eftir gæðum, stærð, veiðarfærum og markaði.
+            </p>
+
+            <div class="results-grid">
+                <div class="result-card value-card">
+                    <h3>💰 Heildar Áætlað Verðmæti</h3>
+                    <div class="result-line large">
+                        <span>Samtals:</span>
+                        <span class="result-value" style="font-size:1.5rem;" id="est-total-val">0 kr</span>
+                    </div>
+                    <div class="result-line"
+                        style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: 10px; margin-top: 10px;">
+                        <span>Veiðigjald hlutfall:</span>
+                        <span class="result-value" id="est-fee-percent">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tegund</th>
+                        <th class="num">Kg</th>
+                        <th class="num">Áætlað Verð</th>
+                        <th class="num">Verðmæti</th>
+                    </tr>
+                </thead>
+                <tbody id="value-table-body"></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">💰 Niðurstaða (Veiðigjöld)</h2>
+            </div>
+            <div class="results-grid">
+                <div class="result-card">
+                    <h3>💡 Sundurliðun</h3>
+                    <div class="result-line" style="margin-top:10px;">
+                        <span>Brúttó gjald:</span>
+                        <span class="result-value" id="res-gross">0 kr</span>
+                    </div>
+                    <div class="result-line" style="color:#ef4444;">
+                        <span>Afsláttur (Þorskur/Ýsa):</span>
+                        <span class="result-value" id="res-disc-cod">0 kr</span>
+                    </div>
+                    <div class="result-line" style="color:#ef4444;">
+                        <span>Afsláttur (Annað):</span>
+                        <span class="result-value" id="res-disc-other">0 kr</span>
+                    </div>
+                    <div class="result-line" style="border-top:1px solid #e5e7eb; padding-top:8px; font-weight:600;">
+                        <span>Afsláttur samtals:</span>
+                        <span class="result-value" id="res-disc-total">0 kr</span>
+                    </div>
+                </div>
+
+                <div class="result-card highlight">
+                    <h3>💎 Nettó Greiðsla</h3>
+                    <div class="result-line large">
+                        <span>Til greiðslu:</span>
+                        <span class="result-value" style="font-size:1.5rem;" id="res-net">0 kr</span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tegund</th>
+                        <th class="num">Magn (kg)</th>
+                        <th class="num">Taxti (kr/kg)</th>
+                        <th class="num">Brúttó Gjald</th>
+                    </tr>
+                </thead>
+                <tbody id="result-table-body"></tbody>
+            </table>
+
+            <div class="concert-comparison">
+                <h3>🎭 Samanburður</h3>
+                <div class="result-line" style="align-items: center; justify-content: start; gap: 10px;">
+                    <span>Ef þetta væru tónleikaskattar (kr):</span>
+                    <input type="number" id="concert-tax" placeholder="Sláðu inn tölu frá hinu appinu"
+                        style="width: 200px; padding: 8px;" onkeyup="compareTaxes()">
+                </div>
+                <div id="comparison-result" style="margin-top: 10px; font-weight: 600; color: #0f766e;"></div>
+            </div>
+        </div>
+
+        <p class="disclaimer">
+            ⚠️ Þetta er áætluð reiknivél byggð á kr/kg taxta og einfaldri beitingu frítekjumarks/afsláttar.<br>
+            Raunálagning fer eftir skráningu, skilum og uppgjöri.<br>
+            Taxtar eru sjálfgefnir (2026) og hægt að breyta í Advanced.
+        </p>
+    </div>
+
+    <script>
+        // DEFAULT RATES 2026 (kr/kg)
+        const DEFAULT_RATES = {
+            "Þorskur": 50.79,
+            "Ýsa": 22.92,
+            "Ufsi": 14.34,
+            "Karfi/gullkarfi": 12.43,
+            "Langa": 12.84,
+            "Keila": 4.74,
+            "Steinbítur": 13.89,
+            "Hlýri": 13.69,
+            "Grálúða": 43.50,
+            "Lúða": 54.42,
+            "Skarkoli": 31.42,
+            "Þykkvalúra/sólkoli": 49.26,
+            "Langlúra": 35.24,
+            "Sandkoli": 14.57,
+            "Síld": 4.37,
+            "Kolmunni": 2.31,
+            "Makríll": 26.17,
+            "Rækja/djúprækja": 9.04,
+            "Djúpkarfi": 16.82,
+            "Grásleppa": 19.11
+        };
+
+        // DEFAULT PRICES FOR ESTIMATION
+        const PRICE_ESTIMATE_ISK_PER_KG = {
+            "Þorskur": 405.15,
+            "Ýsa": 291.71,
+            "Karfi/gullkarfi": 180.68,
+            "Ufsi": 186.18
+        };
+
+        // State
+        let currentRates = { ...DEFAULT_RATES };
+        let currentPrices = { ...PRICE_ESTIMATE_ISK_PER_KG }; // Copy defaults, others undefined
+
+        let catchData = {}; // Map species -> kg
+
+        // Populate catchData with 0 for all species in DEFAULT_RATES
+        Object.keys(DEFAULT_RATES).forEach(s => catchData[s] = 0);
+
+        // Format
+        const fmt = (n) => Math.round(n).toLocaleString('is-IS') + ' kr';
+        const parse = (s) => parseFloat(s) || 0;
+
+        function init() {
+            renderFeeInputs();
+            renderPriceInputs();
+            renderRows();
+            calculate();
+        }
+
+        // --- UI RENDERERS ---
+
+        function renderRows() {
+            const container = document.getElementById('catch-rows');
+            container.innerHTML = '';
+
+            // Render all species sorted alphabetically (or maybe keep default order?)
+            // Let's keep default order of DEFAULT_RATES keys for logic (Cod/Haddock first usually)
+            Object.keys(DEFAULT_RATES).forEach((species) => {
+                const kg = catchData[species];
+                const div = document.createElement('div');
+                div.className = kg > 0 ? 'row active-row' : 'row';
+
+                div.innerHTML = `
+                    <div class="species-label">${species}</div>
+                    <div class="input-group">
+                        <label>Magn (kg)</label>
+                        <input type="number" value="${kg > 0 ? kg : ''}" placeholder="0" 
+                               onkeyup="updateRow('${species}', this.value)" 
+                               onchange="updateRow('${species}', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Gjald (kr/kg)</label>
+                        <input type="text" value="${currentRates[species] || 0}" disabled style="background:transparent; border:none; padding-left:0; font-weight:600; color:#6b7280;">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderFeeInputs() {
+            const container = document.getElementById('fee-inputs');
+            container.innerHTML = '';
+            for (let [species, rate] of Object.entries(currentRates)) {
+                const div = document.createElement('div');
+                div.className = 'fee-item';
+                div.innerHTML = `
+                    <label>${species}</label>
+                    <input type="number" step="0.01" value="${rate}" 
+                           onchange="updateRate('${species}', this.value)">
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function renderPriceInputs() {
+            const container = document.getElementById('price-inputs');
+            container.innerHTML = '';
+            // Show all species, even if default is 0/undefined
+            for (let species of Object.keys(DEFAULT_RATES)) {
+                const price = currentPrices[species] || 0;
+                const div = document.createElement('div');
+                div.className = 'fee-item';
+                div.innerHTML = `
+                    <label>${species}</label>
+                    <input type="number" step="0.01" value="${price}" 
+                           onchange="updatePrice('${species}', this.value)">
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function toggleFees() {
+            document.getElementById('fees-container').classList.toggle('hidden');
+        }
+
+        function togglePrices() {
+            document.getElementById('prices-container').classList.toggle('hidden');
+        }
+
+        // --- LOGIC ---
+
+        function updateRow(species, value) {
+            catchData[species] = parse(value);
+            // Highlight row if active
+            // Re-rendering entire list is expensive/heavy on focus loss? 
+            // Just update calculation. visual style update on keyup might interrupt typing if we re-render DOM.
+            // Let's NOT re-render rows on keyup, just calc.
+            calculate();
+        }
+
+        function updateRate(species, value) {
+            currentRates[species] = parse(value);
+            renderRows(); // Update read-only rate display
+            calculate();
+        }
+
+        function updatePrice(species, value) {
+            currentPrices[species] = parse(value);
+            calculate();
+        }
+
+        function calculate() {
+            let grossBySpecies = {};
+            let grossTotal = 0;
+            let feeTableHtml = '';
+
+            let estTotalValue = 0;
+            let valTableHtml = '';
+
+            // Loop through all species
+            Object.keys(DEFAULT_RATES).forEach(species => {
+                const kg = catchData[species];
+                if (kg > 0) {
+                    // FEE CALC
+                    const rate = currentRates[species] || 0;
+                    const feeTotal = kg * rate;
+
+                    grossBySpecies[species] = feeTotal;
+                    grossTotal += feeTotal;
+
+                    feeTableHtml += `
+                        <tr>
+                            <td>${species}</td>
+                            <td class="num">${Math.round(kg).toLocaleString('is-IS')}</td>
+                            <td class="num">${rate}</td>
+                            <td class="num">${fmt(feeTotal)}</td>
+                        </tr>
+                    `;
+
+                    // VALUE CALC
+                    const price = currentPrices[species] || 0;
+                    const valTotal = kg * price;
+                    estTotalValue += valTotal;
+
+                    valTableHtml += `
+                         <tr>
+                            <td>${species}</td>
+                            <td class="num">${Math.round(kg).toLocaleString('is-IS')}</td>
+                            <td class="num">${price > 0 ? price.toLocaleString('is-IS') : '<span style="color:#ef4444">0</span>'}</td>
+                            <td class="num">${fmt(valTotal)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            // UPDATE FEE RESULTS
+            document.getElementById('result-table-body').innerHTML = feeTableHtml;
+            document.getElementById('res-gross').innerText = fmt(grossTotal);
+
+            // Allowance Logic
+            const grossCodHaddock = (grossBySpecies["Þorskur"] || 0) + (grossBySpecies["Ýsa"] || 0);
+            const grossOther = grossTotal - grossCodHaddock;
+
+            let allowCodHaddock = 0;
+            let allowOther = 0;
+
+            const useAllowance = document.getElementById('allowance-toggle').checked;
+
+            if (useAllowance) {
+                // Cod/Haddock rule
+                const tier1 = Math.min(grossCodHaddock, 15_000_000);
+                allowCodHaddock += tier1 * 0.65;
+
+                const remainder = Math.max(grossCodHaddock - 15_000_000, 0);
+                const tier2 = Math.min(remainder, 55_000_000);
+                allowCodHaddock += 0.45 * tier2;
+
+                // Other rule
+                allowOther = 0.40 * Math.min(grossOther, 9_000_000);
+            }
+
+            const totalAllowance = allowCodHaddock + allowOther;
+            const netPayable = Math.max(0, grossTotal - totalAllowance);
+
+            document.getElementById('res-disc-cod').innerText = '-' + fmt(allowCodHaddock);
+            document.getElementById('res-disc-other').innerText = '-' + fmt(allowOther);
+            document.getElementById('res-disc-total').innerText = '-' + fmt(totalAllowance);
+            document.getElementById('res-net').innerText = fmt(netPayable);
+
+            // UPDATE VALUE RESULTS
+            document.getElementById('value-table-body').innerHTML = valTableHtml;
+            document.getElementById('est-total-val').innerText = fmt(estTotalValue);
+
+            if (estTotalValue > 0) {
+                const percent = (netPayable / estTotalValue) * 100;
+                document.getElementById('est-fee-percent').innerText = percent.toFixed(2) + '%';
+            } else {
+                document.getElementById('est-fee-percent').innerText = "—";
+            }
+
+            compareTaxes(netPayable);
+        }
+
+        function compareTaxes(currentNet) {
+            if (currentNet === undefined) {
+                // re-read from UI if needed, but usually passed in
+                return;
+            }
+
+            const concertTax = parse(document.getElementById('concert-tax').value);
+            const el = document.getElementById('comparison-result');
+
+            if (!concertTax) {
+                el.innerText = "";
+                return;
+            }
+
+            const diff = currentNet - concertTax;
+            if (diff > 0) {
+                el.innerText = `Útgerðin borgar ${fmt(diff)} MEIRA en tónleikahaldarinn.`;
+                el.style.color = "#ef4444";
+            } else {
+                el.innerText = `Útgerðin borgar ${fmt(Math.abs(diff))} MINNA en tónleikahaldarinn.`;
+                el.style.color = "#10b981";
+            }
+        }
+
+        function loadExample() {
+            clearAll(); // Reset first
+            catchData["Þorskur"] = 400000;
+            catchData["Ýsa"] = 150000;
+            catchData["Karfi/gullkarfi"] = 80000;
+
+            // Also ensure we have prices for these (defaults should be there)
+            // But let's set them just in case user cleared them
+            currentPrices["Þorskur"] = 405.15;
+            currentPrices["Ýsa"] = 291.71;
+            currentPrices["Karfi/gullkarfi"] = 180.68;
+            renderPriceInputs(); // Update advanced inputs
+
+            renderRows();
+            calculate();
+        }
+
+        function clearAll() {
+            Object.keys(DEFAULT_RATES).forEach(s => catchData[s] = 0);
+            document.getElementById('concert-tax').value = '';
+            document.getElementById('comparison-result').innerText = '';
+            renderRows();
+            calculate();
+        }
+
+        function copyData() {
+            const data = {
+                catch: catchData,
+                rates: currentRates,
+                prices: currentPrices,
+                timestamp: new Date().toISOString()
+            };
+            navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+            alert("Gögn afrituð á clipboard!");
+        }
+
+        // Init
+        init();
+
+    </script>
+</body>
+
+</html>

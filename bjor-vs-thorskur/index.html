@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="is">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bjór vs. Þorskur - Samanburður</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 50%, #b91c1c 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #1f2937;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: backgroundMove 25s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(40px, 40px);
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-back {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .nav-back a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            padding-bottom: 2px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ea580c 0%, #b91c1c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fish-title {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input {
+            padding: 12px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ea580c;
+        }
+
+        input.fish-input:focus {
+            border-color: #0ea5e9;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .vs-card {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+        }
+
+        .fish-card {
+            background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 100%);
+        }
+
+        .big-percent {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .sub-value {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .comparison-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .equiv-line {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .equiv-line strong {
+            color: #c2410c;
+            font-weight: 800;
+            font-size: 1.8rem;
+        }
+
+        .keg-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .locked-input {
+            background: #f3f4f6;
+            border-color: transparent;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .big-percent {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="nav-back">
+            <a href="/">🏠 Heim</a>
+        </div>
+
+        <h1>🍺 Bjór vs. Þorskur 🐟</h1>
+        <p class="subtitle">Skemmtistaðurinn vs. Útgerðin.<br>Hvað þarf marga bjórkúta til að borga sömu skatta?</p>
+
+        <!-- FISHING SECTION -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title fish-title">🐟 Útgerðin (Þorskur)</h2>
+            </div>
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Aflaheimild (tonn)</label>
+                    <input type="number" id="cod-tonnes" value="400" onkeyup="calc()" placeholder="0" class="fish-input"
+                        style="font-size: 1.2rem; font-weight: 700;">
+                </div>
+                <div class="input-group">
+                    <label>Áætlað Aflaverðmæti (kr)</label>
+                    <input type="text" id="catch-value" disabled class="locked-input">
+                </div>
+                <div class="input-group">
+                    <label>Nettó Veiðigjald (kr)</label>
+                    <input type="text" id="net-fee" disabled class="locked-input">
+                </div>
+            </div>
+
+            <div class="result-card fish-card">
+                <div>Veiðigjöld sem % af verðmæti</div>
+                <div class="big-percent" id="fish-percent">0.00%</div>
+                <div class="sub-value">Miðað við 2026 taxta fyrir þorsk og fulla nýtingu á frítekjumarki.</div>
+            </div>
+        </div>
+
+        <!-- PUNCHLINE SECTION -->
+        <div class="section" style="border: 4px solid #ea580c; background: #fffaf0;">
+            <div class="section-header" style="border-bottom: none; margin-bottom: 10px;">
+                <h2 class="section-title" style="width:100%; text-align:center;">⚖️ Jafngildi</h2>
+            </div>
+
+            <div class="comparison-box" style="border:none; background:transparent; margin-top:0; padding-top:0;">
+                <p style="margin-bottom: 20px; font-size: 1.1rem; color: #4b5563;">
+                    Til að ríkið fái sömu tekjur í áfengisgjöld og útgerðin borgar af þessum afla...<br>
+                    ...þyrfti barinn að selja:
+                </p>
+
+                <div class="keg-icon">🛢️</div>
+                <div class="equiv-line">
+                    <strong id="equiv-kegs">0</strong> bjórkúta (30L)
+                </div>
+                <div style="font-size: 1rem; color: #6b7280;">(Miðað við 5% ABV)</div>
+            </div>
+        </div>
+
+        <!-- ALCOHOL RATES REFERENCE -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">📊 Áfengisgjöld (Reiknivél)</h2>
+            </div>
+            <p style="margin-bottom: 20px; color: #4b5563;">Hér getur þú séð hvað ríkið tekur af hverri vörutegund miðað
+                við áætlað söluverð.</p>
+
+            <div class="input-grid">
+                <!-- BEER -->
+                <div class="input-group" style="background:#f9fafb; padding:15px; border-radius:10px;">
+                    <h4 style="margin-bottom:10px;">🍺 Bjór (5%)</h4>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>Verð (0.5L):</span> <input type="number" value="1500" id="beer-price"
+                            onkeyup="calcRates()" style="width:80px; padding:6px;">
+                    </div>
+                    <div style="font-weight:700; color:#ea580c;" id="beer-tax-pct">Tax: 0%</div>
+                </div>
+
+                <!-- WINE -->
+                <div class="input-group" style="background:#f9fafb; padding:15px; border-radius:10px;">
+                    <h4 style="margin-bottom:10px;">🍷 Vín (12%)</h4>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>Verð (0.75L):</span> <input type="number" value="2500" id="wine-price"
+                            onkeyup="calcRates()" style="width:80px; padding:6px;">
+                    </div>
+                    <div style="font-weight:700; color:#ea580c;" id="wine-tax-pct">Tax: 0%</div>
+                </div>
+
+                <!-- SPIRITS -->
+                <div class="input-group" style="background:#f9fafb; padding:15px; border-radius:10px;">
+                    <h4 style="margin-bottom:10px;">🥃 Sterkt (40%)</h4>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>Verð (0.7L):</span> <input type="number" value="9000" id="spirits-price"
+                            onkeyup="calcRates()" style="width:80px; padding:6px;">
+                    </div>
+                    <div style="font-weight:700; color:#ea580c;" id="spirits-tax-pct">Tax: 0%</div>
+                </div>
+            </div>
+        </div>
+
+
+        <p class="disclaimer">
+            <strong>Forsendur (2026):</strong><br>
+            Þorskur: Verð 405,15 kr/kg. Veiðigjald 50,79 kr/kg. Frítekjumark nýtt að fullu (65%/45% reglur).<br>
+            Áfengisgjald: Bjór 156,45 kr/cl, Vín 142,50 kr/cl, Sterkt 192,85 kr/cl.<br>
+            Þetta er einföldun, en sýnir stærðargráðuna.
+        </p>
+
+    </div>
+
+    <script>
+        const fmt = (n) => Math.round(n).toLocaleString('is-IS');
+        const parse = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+        // 2026 CONSTANTS
+        const COD_PRICE = 405.15;
+        const COD_FEE_RATE = 50.79;
+
+        const RATE_BEER = 156.45;
+        const RATE_WINE = 142.50;
+        const RATE_SPIRITS = 192.85;
+
+        // KEG CONSTANTS
+        const KEG_LITERS = 30;
+        const KEG_ABV = 5.0; // 5%
+        // calc tax per keg once
+        const KEG_TAX = KEG_LITERS * KEG_ABV * RATE_BEER; // 30 * 5 * 156.45 = 23467.5
+
+        function calc() {
+            // 1. FISHING CALC
+            const tonnes = parse('cod-tonnes');
+            const kg = tonnes * 1000;
+
+            const catchValue = kg * COD_PRICE;
+            const grossFee = kg * COD_FEE_RATE;
+
+            // Calc Allowance (Simplified for Cod only scenario, assuming this is the only catch)
+            // Rule: 65% off first 15m, 45% off next 40m (up to 55m base).
+            let allowance = 0;
+            const tier1 = Math.min(grossFee, 15_000_000);
+            allowance += tier1 * 0.65;
+
+            const remainder = Math.max(grossFee - 15_000_000, 0);
+            const tier2 = Math.min(remainder, 55_000_000); // Actually rule says 45% of value exceeding 15m. Is there a cap?
+            // Re-reading rule from previous file: "45% (af næstu 40m kr)". So max 40m in that tier.
+            allowance += 0.45 * Math.min(remainder, 40_000_000);
+
+            const netFee = Math.max(0, grossFee - allowance);
+
+            // Update UI
+            document.getElementById('catch-value').value = fmt(catchValue) + ' kr';
+            document.getElementById('net-fee').value = fmt(netFee) + ' kr';
+
+            let fishPct = 0;
+            if (catchValue > 0) fishPct = (netFee / catchValue) * 100;
+            document.getElementById('fish-percent').innerText = fishPct.toFixed(2) + '%';
+
+            // 2. EQUIVALENCY (KEGS)
+            let kegs = 0;
+            if (netFee > 0) {
+                kegs = netFee / KEG_TAX;
+            }
+            document.getElementById('equiv-kegs').innerText = fmt(kegs);
+        }
+
+        function calcRates() {
+            // Beer
+            const bPrice = parse('beer-price'); // 0.5L
+            const bTax = 0.5 * 5.0 * RATE_BEER;
+            const bPct = (bTax / bPrice) * 100;
+            document.getElementById('beer-tax-pct').innerText = `Gjald: ${bPct.toFixed(1)}%`;
+
+            // Wine
+            const wPrice = parse('wine-price'); // 0.75L
+            const wTax = 0.75 * 12.0 * RATE_WINE;
+            const wPct = (wTax / wPrice) * 100;
+            document.getElementById('wine-tax-pct').innerText = `Gjald: ${wPct.toFixed(1)}%`;
+
+            // Spirits
+            const sPrice = parse('spirits-price'); // 0.7L
+            const sTax = 0.7 * 40.0 * RATE_SPIRITS;
+            const sPct = (sTax / sPrice) * 100;
+            document.getElementById('spirits-tax-pct').innerText = `Gjald: ${sPct.toFixed(1)}%`;
+        }
+
+        // Init
+        calc();
+        calcRates();
+    </script>
+</body>
+
+</html>
