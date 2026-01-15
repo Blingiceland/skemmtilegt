@@ -689,9 +689,9 @@
         <div class="controls">
             <button class="btn btn-primary" onclick="loadScenario('dillon')">🎸 Gigg á Dillon</button>
             <button class="btn btn-primary" onclick="loadScenario('stort')">🎭 Stórt Tónleikahald</button>
-            <button class="btn btn-primary" onclick="loadScenario('bar')">🍺 Bar Viðburður</button>
             <button class="btn btn-secondary" onclick="resetAll()">🔄 Hreinsa Allt</button>
         </div>
+
 
         <!-- LAUN -->
         <div class="section">
@@ -715,6 +715,25 @@
                 <h2 class="section-title">🧾 VSK (Virðisaukaskattur)</h2>
             </div>
             <div id="vat-container"></div>
+        </div>
+
+        <!-- MIÐASALA -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎫 Miðasala</h2>
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>Heildartekjur af miðasölu (VSK-laust)</label>
+                    <input type="number" id="ticket-sales" value="0" placeholder="0 kr"
+                        onchange="updateTicketSales(parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Greiðslur til listamanns (dregst frá)</label>
+                    <input type="number" id="artist-payment" value="0" placeholder="0 kr" disabled
+                        style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            </div>
         </div>
 
         <!-- NIÐURSTÖÐUR -->
@@ -757,11 +776,23 @@
             </div>
 
             <div class="result-card total">
-                <h3>📊 Samtals Skatttekjur</h3>
-                <div class="result-line total-line">
+                <h3>📊 Yfirlit</h3>
+
+                <!-- VELTA -->
+                <div class="result-line">
+                    <span>Samtals velta (m. VSK):</span>
+                    <span class="result-value" id="total-revenue">0 kr</span>
+                </div>
+
+                <!-- SKATTTEKJUR -->
+                <div class="result-line total-line" style="margin-top: 20px;">
                     <span>Heildarskatttekjur:</span>
                     <span class="result-value" id="grand-total">0 kr</span>
                 </div>
+                <div id="tax-breakdown" style="font-size:0.85rem; padding-left:10px; opacity:0.8; margin-bottom:15px;">
+                </div>
+
+                <!-- MISMUNUR -->
             </div>
         </div>
     </div>
@@ -800,46 +831,107 @@
         // ========================================
         // FIXED WAGE CATEGORIES
         // ========================================
-        let wages = {
-            listafólk: { amount: 0 },
-            hljóðmaður: { amount: 0 },
-            starfsfólk: { amount: 0 },
-            þrif: { amount: 0 }
-        };
+        // DYNAMIC WAGE CATEGORIES
+        // ========================================
+        // using an array to guarantee order and allow additions
+        let wageItems = [
+            { id: 'listafolk', label: 'Listafólk', amount: 0, isCustom: false },
+            { id: 'hljóðmaður', label: 'Hljóðmaður', amount: 0, isCustom: false },
+            { id: 'starfsfólk', label: 'Starfsfólk', amount: 0, isCustom: false },
+            { id: 'þrif', label: 'Þrif', amount: 0, isCustom: false },
+            { id: 'oryggisgaesla', label: 'Öryggisgæsla', amount: 0, isCustom: false },
+            { id: 'loggaesla', label: 'Löggæsla', amount: 0, isCustom: false }
+        ];
+
+        // ========================================
+        // TICKET SALES (VSK-free revenue)
+        // ========================================
+        let ticketSales = 0;
+        let artistPayment = 0;
+
+        function updateTicketSales(value) {
+            ticketSales = value;
+            calculate();
+        }
+
+        function updateArtistPayment(value) {
+            artistPayment = value;
+            calculate();
+        }
 
         function renderWages() {
             const container = document.getElementById('wages-container');
             container.innerHTML = '';
 
-            const categories = [
-                { key: 'listafólk', label: 'Listafólk' },
-                { key: 'hljóðmaður', label: 'Hljóðmaður' },
-                { key: 'starfsfólk', label: 'Starfsfólk' },
-                { key: 'þrif', label: 'Þrif' }
-            ];
-
-            categories.forEach(cat => {
-                const row = wages[cat.key];
+            wageItems.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'row row-wages';
+
+                // Label input (disabled for fixed, enabled for custom)
+                const labelInput = item.isCustom
+                    ? `<input type="text" value="${item.label}" onchange="updateWageLabel(${index}, this.value)" placeholder="Lýsing..." style="font-weight: 600;">`
+                    : `<input type="text" value="${item.label}" disabled style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">`;
+
+                // Remove button for custom rows
+                const removeBtn = item.isCustom
+                    ? `<button class="remove-btn" onclick="removeWageRow(${index})" style="padding: 10px; font-size: 1rem;">🗑️</button>`
+                    : ``;
+
                 div.innerHTML = `
                     <div class="input-group">
-                        <label>${cat.label}</label>
-                        <input type="text" value="${cat.label}" disabled
-                               style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                        <label>${item.isCustom ? 'Lýsing' : item.label}</label>
+                        ${labelInput}
                     </div>
                     <div class="input-group">
                         <label>Upphæð (kr)</label>
-                        <input type="number" value="${row.amount}" 
-                               onchange="updateWage('${cat.key}', 'amount', parseFloat(this.value) || 0)">
+                        <input type="number" value="${item.amount}" 
+                               onchange="updateWageAmount(${index}, parseFloat(this.value) || 0)">
                     </div>
                 `;
+
+                // Add remove button column if custom
+                if (item.isCustom) {
+                    const btnDiv = document.createElement('div');
+                    btnDiv.innerHTML = removeBtn;
+                    div.appendChild(btnDiv);
+                    div.style.gridTemplateColumns = "2fr 1fr auto"; // Ensure 3 columns
+                }
+
                 container.appendChild(div);
             });
+
+            // Add "Add Row" button at the bottom
+            const addDiv = document.createElement('div');
+            addDiv.style.marginTop = '20px';
+            addDiv.style.textAlign = 'center';
+            addDiv.innerHTML = `<button class="add-btn" onclick="addWageRow()">+ Bæta við launalið</button>`;
+            container.appendChild(addDiv);
         }
 
-        function updateWage(key, field, value) {
-            wages[key][field] = value;
+        function updateWageAmount(index, value) {
+            wageItems[index].amount = value;
+
+            // If this is Listafólk, sync with artist payment
+            if (wageItems[index].id === 'listafolk') {
+                artistPayment = value;
+                document.getElementById('artist-payment').value = value;
+            }
+
+            calculate();
+        }
+
+        function updateWageLabel(index, value) {
+            wageItems[index].label = value;
+        }
+
+        function addWageRow() {
+            wageItems.push({ id: `custom_${Date.now()}`, label: '', amount: 0, isCustom: true });
+            renderWages();
+        }
+
+        function removeWageRow(index) {
+            wageItems.splice(index, 1);
+            renderWages();
             calculate();
         }
 
@@ -847,7 +939,8 @@
         // FIXED VSK CATEGORIES
         // ========================================
         let vsk = {
-            leiga: { amount: 0, vskRate: 0.24 }
+            leiga: { amount: 0, vskRate: 0.24 },
+            markadur: { amount: 0, vskRate: 0.24 }
         };
 
         function renderVAT() {
@@ -855,65 +948,14 @@
             container.innerHTML = '';
 
             // 1. Leiga á búnaði (manual input, innskattur)
-            const leigaVSK = vsk.leiga.amount * 0.24;
-            const leigaTotal = vsk.leiga.amount + leigaVSK;
+            renderVATRow(container, 'Leiga á búnaði', 'leiga');
 
-            let div = document.createElement('div');
-            div.className = 'row row-vat';
-            div.innerHTML = `
-                <div class="input-group">
-                    <label>Leiga á búnaði (24%)</label>
-                    <input type="text" value="Leiga á búnaði" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-                <div class="input-group">
-                    <label>Upphæð án VSK (kr)</label>
-                    <input type="number" value="${vsk.leiga.amount}" 
-                           onchange="updateVSK('leiga', 'amount', parseFloat(this.value) || 0)">
-                </div>
-                <div class="input-group">
-                    <label>VSK upphæð (kr)</label>
-                    <input type="text" value="${formatCurrency(leigaVSK)}" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-                <div class="input-group">
-                    <label>Samtals með VSK (kr)</label>
-                    <input type="text" value="${formatCurrency(leigaTotal)}" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-            `;
-            container.appendChild(div);
+            // 2. Markaðskostnaður (manual input, innskattur)
+            renderVATRow(container, 'Markaðskostnaður', 'markadur');
 
-            // 2. Hljóðmaður (auto from wages, innskattur)
-            const hljóðmaðurAmount = wages.hljóðmaður.amount;
-            const hljóðmaðurVSK = hljóðmaðurAmount * 0.24;
-            const hljóðmaðurTotal = hljóðmaðurAmount + hljóðmaðurVSK;
 
-            div = document.createElement('div');
-            div.className = 'row row-vat';
-            div.innerHTML = `
-                <div class="input-group">
-                    <label>Hljóðmaður (24%)</label>
-                    <input type="text" value="Hljóðmaður" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-                <div class="input-group">
-                    <label>Upphæð án VSK (kr)</label>
-                    <input type="text" value="${formatCurrency(hljóðmaðurAmount)}" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-                <div class="input-group">
-                    <label>VSK upphæð (kr)</label>
-                    <input type="text" value="${formatCurrency(hljóðmaðurVSK)}" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-                <div class="input-group">
-                    <label>Samtals með VSK (kr)</label>
-                    <input type="text" value="${formatCurrency(hljóðmaðurTotal)}" disabled
-                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
-                </div>
-            `;
-            container.appendChild(div);
+
+            // 2. Hljóðmaður (removed per user request - treated as wage earner)
 
             // 3. Matur & Drykkur (auto from alcohol sales, útskattur)
             const bjórRevenue = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
@@ -925,7 +967,7 @@
             const alcoholBase = totalAlcoholRevenue / 1.11;
             const alcoholVSK = totalAlcoholRevenue - alcoholBase;
 
-            div = document.createElement('div');
+            let div = document.createElement('div');
             div.className = 'row row-vat';
             div.innerHTML = `
                 <div class="input-group">
@@ -946,6 +988,38 @@
                 <div class="input-group">
                     <label>Samtals með VSK (kr)</label>
                     <input type="text" value="${formatCurrency(totalAlcoholRevenue)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function renderVATRow(container, label, key) {
+            const amount = vsk[key].amount;
+            const vskAmt = amount * vsk[key].vskRate;
+            const total = amount + vskAmt;
+
+            const div = document.createElement('div');
+            div.className = 'row row-vat';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>${label} (${vsk[key].vskRate * 100}%)</label>
+                    <input type="text" value="${label}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Upphæð án VSK (kr)</label>
+                    <input type="number" value="${amount}" 
+                           onchange="updateVSK('${key}', 'amount', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>VSK upphæð (kr)</label>
+                    <input type="text" value="${formatCurrency(vskAmt)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Samtals með VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(total)}" disabled
                            style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
                 </div>
             `;
@@ -994,6 +1068,11 @@
                            onchange="updateAlcohol('bjór', 'pricePerPint', parseFloat(this.value) || 0)">
                 </div>
                 <div class="input-group">
+                    <label>Heildarsala (kr)</label>
+                    <input type="text" value="${formatCurrency(bjórRevenue)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
                     <label>Áætlað áfengisgjald</label>
                     <input type="text" value="${formatCurrency(bjórExcise)}" disabled
                            style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
@@ -1023,6 +1102,11 @@
                     <label>Verð/einfaldur (kr)</label>
                     <input type="number" value="${alcohol.sterkt.pricePerShot}" step="1"
                            onchange="updateAlcohol('sterkt', 'pricePerShot', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Heildarsala (kr)</label>
+                    <input type="text" value="${formatCurrency(sterktRevenue)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
                 </div>
                 <div class="input-group">
                     <label>Áætlað áfengisgjald</label>
@@ -1056,9 +1140,50 @@
                            onchange="updateAlcohol('vín', 'pricePerBottle', parseFloat(this.value) || 0)">
                 </div>
                 <div class="input-group">
+                    <label>Heildarsala (kr)</label>
+                    <input type="text" value="${formatCurrency(vínRevenue)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
                     <label>Áætlað áfengisgjald</label>
                     <input type="text" value="${formatCurrency(vínExcise)}" disabled
                            style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+
+            // TOTAL ROW
+            const totalRevenue = bjórRevenue + sterktRevenue + vínRevenue;
+            const totalExcise = bjórExcise + sterktExcise + vínExcise;
+
+            div = document.createElement('div');
+            div.className = 'row row-alcohol';
+            div.style.borderTop = '2px solid rgba(255,255,255,0.3)';
+            div.style.marginTop = '15px';
+            div.style.paddingTop = '15px';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label style="font-weight: 700;">SAMTALS</label>
+                    <input type="text" value="Samtals" disabled
+                           style="background: #e0e7ff; cursor: not-allowed; font-weight: 700; color: #4338ca;">
+                </div>
+                <div class="input-group">
+                    <label>&nbsp;</label>
+                    <input type="text" value="" disabled style="background: transparent; border: none;">
+                </div>
+                <div class="input-group">
+                    <label>&nbsp;</label>
+                    <input type="text" value="" disabled style="background: transparent; border: none;">
+                </div>
+                <div class="input-group">
+                    <label style="font-weight: 700;">Heildarsala</label>
+                    <input type="text" value="${formatCurrency(totalRevenue)}" disabled
+                           style="background: #e0e7ff; cursor: not-allowed; font-weight: 700; color: #4338ca;">
+                </div>
+                <div class="input-group">
+                    <label style="font-weight: 700;">Samtals áfengisgjald</label>
+                    <input type="text" value="${formatCurrency(totalExcise)}" disabled
+                           style="background: #e0e7ff; cursor: not-allowed; font-weight: 700; color: #4338ca;">
                 </div>
             `;
             container.appendChild(div);
@@ -1081,7 +1206,7 @@
             let statePayroll = 0;
             let municipalTax = 0;
 
-            Object.values(wages).forEach(row => {
+            wageItems.forEach(row => {
                 const amount = row.amount;
 
                 // Gross tax (no personal allowance)
@@ -1111,7 +1236,10 @@
             let inputVAT = 0;
 
             // 1. Leiga á búnaði (innskattur)
-            inputVAT += vsk.leiga.amount * 0.24;
+            inputVAT += vsk.leiga.amount * vsk.leiga.vskRate;
+
+            // 1b. Markaðskostnaður (innskattur)
+            inputVAT += vsk.markadur.amount * vsk.markadur.vskRate;
 
             // 2. Matur & Drykkur from alcohol (útskattur)
             const bjórRevenue = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
@@ -1168,15 +1296,22 @@
 
             // Expenses:
             let totalGrossWages = 0;
-            Object.values(wages).forEach(row => totalGrossWages += row.amount); // These are gross wage costs
+            wageItems.forEach(row => totalGrossWages += row.amount);
 
-            const totalGrossRent = vsk.leiga.amount * 1.24; // Rent + 24% VSK
+            const totalGrossRent = vsk.leiga.amount * (1 + vsk.leiga.vskRate);
+            const totalGrossMarketing = vsk.markadur.amount * (1 + vsk.markadur.vskRate);
 
-            // Alcohol Revenue (Gross)
+            // Alcohol Revenue (Gross, includes 11% VSK)
             const bjórRev = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
             const sterktRev = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
             const vínRev = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
-            const totalRevenue = bjórRev + sterktRev + vínRev;
+            const alcoholRevenue = bjórRev + sterktRev + vínRev;
+
+            // Net Ticket Revenue (after artist payment)
+            const netTicketRevenue = ticketSales - artistPayment;
+
+            // Total Revenue = Alcohol (with VSK) + Net Tickets
+            const totalRevenue = alcoholRevenue + netTicketRevenue;
 
             // Retained Earnings (Cash in hand after paying everyone)
             // Logic: Revenue - (Total Taxes Paid to Gov? No, that double counts).
@@ -1227,20 +1362,19 @@
 
             // Net Wages Calculation:
             let totalNetWagesToStaff = 0;
-            Object.values(wages).forEach(row => {
+            wageItems.forEach(row => {
                 const gross = row.amount;
-                // Tax deduction
-                const grossTax = gross * HEILD_STADGREIDSLA; // Assuming no personal allowance for simplicity
+                const grossTax = gross * HEILD_STADGREIDSLA;
                 totalNetWagesToStaff += (gross - grossTax);
             });
 
-            const cashOut = totalNetWagesToStaff + totalGrossRent + grandTotal;
+            const cashOut = totalNetWagesToStaff + totalGrossRent + totalGrossMarketing + grandTotal;
             const retainedEarnings = totalRevenue - cashOut;
 
             // Ratios
             let alcoholTaxRatioRevenue = 0;
-            if (totalRevenue > 0) {
-                alcoholTaxRatioRevenue = (alcoholExcise / totalRevenue) * 100;
+            if (alcoholRevenue > 0) {
+                alcoholTaxRatioRevenue = (alcoholExcise / alcoholRevenue) * 100;
             }
 
             let alcoholTaxRatioProfit = 0;
@@ -1260,7 +1394,19 @@
             document.getElementById('municipal-tax').textContent = formatCurrency(municipalTax);
             document.getElementById('municipal-total').textContent = formatCurrency(municipalTotal);
 
+            // UPDATE UI
+            document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
             document.getElementById('grand-total').textContent = formatCurrency(grandTotal);
+
+            // Detailed Tax Breakdown
+            const taxBreakdownHTML = `
+                <div style="display: flex; justify-content: space-between;"><span>VSK (nettó):</span> <span>${formatCurrency(netVAT)}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Útsvar:</span> <span>${formatCurrency(municipalTotal)}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Tryggingagjald:</span> <span>${formatCurrency(statePayroll)}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Áfengisgjald:</span> <span>${formatCurrency(alcoholExcise)}</span></div>
+                <div style="display: flex; justify-content: space-between;"><span>Staðgreiðsla:</span> <span>${formatCurrency(stateIncome)}</span></div>
+            `;
+            document.getElementById('tax-breakdown').innerHTML = taxBreakdownHTML;
 
             // VAT breakdown details
             const vatBreakdown = `
@@ -1271,94 +1417,53 @@
                 </div>
             `;
             document.getElementById('vat-breakdown').innerHTML = vatBreakdown;
-
-            // RETAINED EARNINGS SECTION (New)
-            const profitSection = `
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
-                    <div class="result-line">
-                        <span>Eftir í sjóðnum:</span>
-                        <span class="result-value" style="color:#a7f3d0">${formatCurrency(retainedEarnings)}</span>
-                    </div>
-                    
-                    <div style="font-size:0.9rem; margin-top:15px; color:rgba(255,255,255,0.8);">
-                        <div style="display: flex; justify-content: space-between; margin-bottom:5px;">
-                            <span>Áfengisgjald af veltu:</span>
-                            <strong>${alcoholTaxRatioRevenue.toFixed(1)}%</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Áfengisgjald vs. Sjóður:</span>
-                            <strong>${retainedEarnings > 0 ? alcoholTaxRatioProfit.toFixed(1) + '%' : 'N/A'}</strong>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Append to Grand Total card (or create new UI element?)
-            // We can append to the 'grand-total' parent element if we had an ID, but let's just inject into the card logic.
-            // Since we are replacing the whole block, calculate() function is fine.
-            // But wait, the 'result-card total' HTML structure is fixed in the DOM, we only update innerText usually.
-            // We need to inject this new HTML dynamically.
-
-            // Let's check if the 'profit-section' already exists.
-            let profitDiv = document.getElementById('profit-section');
-            if (!profitDiv) {
-                const totalCard = document.querySelector('.result-card.total');
-                profitDiv = document.createElement('div');
-                profitDiv.id = 'profit-section';
-                totalCard.appendChild(profitDiv);
-            }
-            profitDiv.innerHTML = profitSection;
         }
 
         // ========================================
         // EXAMPLE & RESET
         // ========================================
+        function setWage(id, amount) {
+            const item = wageItems.find(w => w.id === id);
+            if (item) item.amount = amount;
+        }
+
         function loadScenario(type) {
-            // Reset fixed structures first
             resetDataStructures();
 
             if (type === 'dillon') {
-                // LITLA GIGGIÐ (DILLON)
-                // Band: 100k, Hljóð: 40k, Starfsfólk: 1 manneskja í 6kt (ca 25-30k), Þrif: 15k
-                wages.listafólk = { amount: 100000 };
-                wages.hljóðmaður = { amount: 40000 };
-                wages.starfsfólk = { amount: 30000 };
-                wages.þrif = { amount: 15000 };
+                setWage('listafolk', 100000);
+                setWage('hljóðmaður', 40000);
+                setWage('starfsfólk', 30000);
+                setWage('þrif', 15000);
+                setWage('oryggisgaesla', 20000);
 
-                // "2 30 litrar af bjór" = 60L = 120 pints
-                // "tæpar 2 flöskur af sterku" = ca 1.4-1.5L = ~50 shots
-                alcohol.bjór = { pints: 120, pricePerPint: 1300, abv: 4.5 };
+                ticketSales = 150000; // Small venue ticket sales
+                document.getElementById('ticket-sales').value = ticketSales;
+
+                alcohol.bjór = { pints: 80, pricePerPint: 1500, abv: 4.5 };
                 alcohol.sterkt = { shots: 50, pricePerShot: 1600, abv: 40.0 };
-                alcohol.vín = { bottles: 0, pricePerBottle: 6000, abv: 12.5 };
+                alcohol.vín = { bottles: 2, pricePerBottle: 6000, abv: 12.5 };
 
-                // Engin leiga (staðurinn á græjur)
                 vsk.leiga = { amount: 0, vskRate: 0.24 };
+                vsk.markadur = { amount: 0, vskRate: 0.24 };
 
             } else if (type === 'stort') {
-                // STÓRA GIGGIÐ
-                wages.listafólk = { amount: 1500000 };
-                wages.hljóðmaður = { amount: 250000 };
-                wages.starfsfólk = { amount: 400000 };
-                wages.þrif = { amount: 100000 };
+                setWage('listafolk', 1500000);
+                setWage('hljóðmaður', 250000);
+                setWage('starfsfólk', 400000);
+                setWage('þrif', 100000);
+                setWage('oryggisgaesla', 0); // User will provide
+                setWage('loggaesla', 0);    // User will provide
+
+                ticketSales = 5000000; // Large event ticket sales
+                document.getElementById('ticket-sales').value = ticketSales;
 
                 alcohol.bjór = { pints: 800, pricePerPint: 1400, abv: 5.0 };
                 alcohol.sterkt = { shots: 400, pricePerShot: 1800, abv: 40.0 };
                 alcohol.vín = { bottles: 60, pricePerBottle: 7500, abv: 13.0 };
 
                 vsk.leiga = { amount: 500000, vskRate: 0.24 };
-
-            } else if (type === 'bar') {
-                // BAR VIÐBURÐUR (DJ / Karaoke etc)
-                wages.listafólk = { amount: 50000 };
-                wages.hljóðmaður = { amount: 0 };
-                wages.starfsfólk = { amount: 150000 }; // Meira starfsfólk
-                wages.þrif = { amount: 40000 };
-
-                alcohol.bjór = { pints: 300, pricePerPint: 1200, abv: 4.5 };
-                alcohol.sterkt = { shots: 200, pricePerShot: 1500, abv: 40.0 };
-                alcohol.vín = { bottles: 10, pricePerBottle: 6500, abv: 12.5 };
-
-                vsk.leiga = { amount: 0, vskRate: 0.24 };
+                vsk.markadur = { amount: 150000, vskRate: 0.24 };
             }
 
             renderWages();
@@ -1368,32 +1473,30 @@
         }
 
         function resetDataStructures() {
-            wages.listafólk = { amount: 0 };
-            wages.hljóðmaður = { amount: 0 };
-            wages.starfsfólk = { amount: 0 };
-            wages.þrif = { amount: 0 };
+            wageItems = [
+                { id: 'listafolk', label: 'Listafólk', amount: 0, isCustom: false },
+                { id: 'hljóðmaður', label: 'Hljóðmaður', amount: 0, isCustom: false },
+                { id: 'starfsfólk', label: 'Starfsfólk', amount: 0, isCustom: false },
+                { id: 'þrif', label: 'Þrif', amount: 0, isCustom: false },
+                { id: 'oryggisgaesla', label: 'Öryggisgæsla', amount: 0, isCustom: false },
+                { id: 'loggaesla', label: 'Löggæsla', amount: 0, isCustom: false }
+            ];
+
+            ticketSales = 0;
+            artistPayment = 0;
+            document.getElementById('ticket-sales').value = 0;
+            document.getElementById('artist-payment').value = 0;
 
             alcohol.bjór = { pints: 0, pricePerPint: 0, abv: 4.5 };
             alcohol.sterkt = { shots: 0, pricePerShot: 0, abv: 40.0 };
             alcohol.vín = { bottles: 0, pricePerBottle: 0, abv: 12.5 };
 
             vsk.leiga = { amount: 0, vskRate: 0.24 };
+            vsk.markadur = { amount: 0, vskRate: 0.24 };
         }
 
-
         function resetAll() {
-            // Reset all fixed structures to zero
-            wages.listafólk = { amount: 0 };
-            wages.hljóðmaður = { amount: 0 };
-            wages.starfsfólk = { amount: 0 };
-            wages.þrif = { amount: 0 };
-
-            alcohol.bjór = { pints: 0, pricePerPint: 0, abv: 4.5 };
-            alcohol.sterkt = { shots: 0, pricePerShot: 0, abv: 40.0 };
-            alcohol.vín = { bottles: 0, pricePerBottle: 0, abv: 12.5 };
-
-            vsk.leiga = { amount: 0, vskRate: 0.24 };
-
+            resetDataStructures();
             renderWages();
             renderAlcohol();
             renderVAT();

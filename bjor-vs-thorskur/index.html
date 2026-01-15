@@ -4,10 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bjór vs. Þorskur - Samanburður</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Bjór vs. Þorskur - Skemmtilegt.is</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;900&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,241 +15,337 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 50%, #b91c1c 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            color: #1f2937;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
-            animation: backgroundMove 25s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        @keyframes backgroundMove {
-            0% {
-                transform: translate(0, 0);
-            }
-
-            100% {
-                transform: translate(40px, 40px);
-            }
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .nav-back {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .nav-back a {
-            color: rgba(255, 255, 255, 0.9);
-            text-decoration: none;
-            font-weight: 600;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 2px;
-        }
-
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 12px;
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.95);
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 1.2rem;
-            font-weight: 500;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .section-header {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            background: #000;
+            overflow: hidden;
+        }
+
+        /* --- LAYOUT --- */
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .side {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #e5e7eb;
+            /* Center horizontally */
+            justify-content: center;
+            /* Center vertically usually */
+            position: relative;
+            transition: all 0.2s;
         }
 
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ea580c 0%, #b91c1c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        /* LEFT: BAR (Dark/Beer) */
+        .side-bar {
+            background: #111;
+            color: #fff;
+            border-right: 2px solid #333;
         }
 
-        .fish-title {
-            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .side-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(234, 88, 12, 0.15), transparent 50%);
+            pointer-events: none;
         }
 
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
+        /* RIGHT: BOAT (Light/Fish) */
+        .side-boat {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .side-boat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.1), transparent 50%);
+            pointer-events: none;
+        }
+
+        /* --- INPUTS & TYPOGRAPHY --- */
+        h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 4rem;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1;
         }
 
         .input-group {
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
         }
 
-        .input-group label {
-            font-size: 0.85rem;
-            color: #6b7280;
-            margin-bottom: 6px;
-            font-weight: 600;
+        label {
+            display: block;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+            font-weight: 700;
         }
 
         input {
-            padding: 12px 14px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
             width: 100%;
+            text-align: center;
+            font-family: 'Anton', sans-serif;
+            font-size: 5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 4px solid;
+            outline: none;
+            padding: 10px 0;
+            transition: all 0.2s;
         }
 
-        input:focus {
-            outline: none;
+        /* Bar Specifics */
+        .side-bar h1 {
+            color: #ea580c;
+            text-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
+        }
+
+        .side-bar input {
+            color: #fff;
+            border-color: #333;
+        }
+
+        .side-bar input:focus {
             border-color: #ea580c;
         }
 
-        input.fish-input:focus {
+        .side-bar input::placeholder {
+            color: #444;
+        }
+
+        /* Boat Specifics */
+        .side-boat h1 {
+            color: #0ea5e9;
+        }
+
+        .side-boat input {
+            color: #111;
+            border-color: #ddd;
+        }
+
+        .side-boat input:focus {
             border-color: #0ea5e9;
         }
 
-        .result-card {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            color: white;
-            padding: 24px;
-            border-radius: 16px;
-            text-align: center;
-            margin-top: 10px;
-            transition: transform 0.3s ease;
+        /* --- METRICS (Bottom) --- */
+        .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            padding-top: 20px;
+            border-top: 1px dashed;
         }
 
-        .result-card:hover {
-            transform: translateY(-5px);
+        .side-bar .metrics {
+            border-color: #333;
         }
 
-        .vs-card {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+        .side-boat .metrics {
+            border-color: #cbd5e1;
         }
 
-        .fish-card {
-            background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 100%);
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
         }
 
-        .big-percent {
-            font-size: 3rem;
-            font-weight: 800;
-            margin: 10px 0;
+        .metric-val {
+            font-weight: 700;
         }
 
-        .sub-value {
-            font-size: 0.95rem;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-
-        .comparison-box {
+        /* --- CENTRAL EQUALIZER --- */
+        .equalizer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
             background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid #e5e7eb;
-            margin-top: 20px;
-            text-align: center;
+            color: #000;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 4px solid #000;
         }
 
-        .equiv-line {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            font-weight: 500;
+        /* --- SHARED REVENUE DISPLAY --- */
+        .revenue-pill {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: #000;
+            color: #22c55e;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border: 2px solid #22c55e;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
         }
 
-        .equiv-line strong {
-            color: #c2410c;
-            font-weight: 800;
-            font-size: 1.8rem;
+        .revenue-label {
+            color: #fff;
+            font-weight: 400;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
         }
 
-        .keg-icon {
-            font-size: 4rem;
-            display: block;
-            margin-bottom: 10px;
+        /* --- BACK BUTTON --- */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+            color: #555;
+            text-decoration: none;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
 
-        .hidden {
-            display: none;
+        .back-btn:hover {
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
         }
 
-        .locked-input {
-            background: #f3f4f6;
-            border-color: transparent;
-            color: #4b5563;
-            font-weight: 600;
-        }
-
-        .disclaimer {
-            text-align: center;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
+        /* --- MOBILE --- */
+        @media (max-width: 1000px) {
+            body {
+                overflow: auto;
+                height: auto;
             }
 
-            .big-percent {
-                font-size: 2.5rem;
+            .wrapper {
+                flex-direction: column;
+            }
+
+            .side {
+                padding: 60px 20px;
+                min-height: 100vh;
+            }
+
+            .revenue-pill {
+                position: fixed;
+                top: 10px;
+                font-size: 1rem;
+                padding: 8px 20px;
+                width: 90%;
+                text-align: center;
+            }
+
+            .back-btn {
+                display: none;
+            }
+
+            /* Or move somewhere else */
+
+            h1 {
+                font-size: 3rem;
+            }
+
+            input {
+                font-size: 4rem;
+            }
+
+            .equalizer {
+                position: fixed;
+                top: 50%;
+                left: auto;
+                right: 10px;
+                transform: translate(0, -50%) scale(0.8);
+                display: none;
+            }
+
+            /* Hide equalizer on mobile or pin it differently? Let's hide simpler */
+        }
+
+        /* FOOTER DISCLAIMER */
+        .disclaimer-footer {
+            background: #111;
+            color: #d1d5db;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            border-top: 1px solid #333;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .disclaimer-content {
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .disclaimer-title {
+            color: #ea580c;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .beer-decoration {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: clink 2s infinite alternate ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(234, 88, 12, 0.4));
+        }
+
+        @keyframes clink {
+            0% {
+                transform: rotate(-10deg);
+            }
+
+            100% {
+                transform: rotate(10deg);
             }
         }
     </style>
@@ -258,241 +353,129 @@
 
 <body>
 
-    <div class="container">
-        <div class="nav-back">
-            <a href="/">🏠 Heim</a>
-        </div>
+    <a href="/" class="back-btn">← Til baka</a>
 
-        <h1>🍺 Bjór vs. Þorskur 🐟</h1>
-        <div style="position: relative; margin-bottom: 30px;">
-            <p class="subtitle">Skemmtistaðurinn vs. Útgerðin.<br><span id="subtitle-text">Hvað þarf marga bjórkúta til
-                    að borga sömu skatta?</span></p>
-            <button onclick="toggleMode()" style="
-                background:white; border:2px solid #ea580c; color:#ea580c; 
-                padding:8px 16px; border-radius:20px; font-weight:700; cursor:pointer; 
-                position:absolute; right:0; top:0; font-size:0.9rem;
-                display:flex; align-items:center; gap:5px;
-            ">
-                🔄 Snúa við
-            </button>
-        </div>
-
-        <!-- FISHING SECTION (NORMAL MODE) -->
-        <div id="fishing-input-section" class="section">
-            <div class="section-header">
-                <h2 class="section-title fish-title">🐟 Útgerðin (Þorskur)</h2>
-            </div>
-
-            <div class="input-grid">
-                <div class="input-group">
-                    <label>Aflaheimild (tonn)</label>
-                    <input type="number" id="cod-tonnes" value="400" onkeyup="calc()" placeholder="0" class="fish-input"
-                        style="font-size: 1.2rem; font-weight: 700;">
-                </div>
-                <div class="input-group">
-                    <label>Áætlað Aflaverðmæti (kr)</label>
-                    <input type="text" id="catch-value" disabled class="locked-input">
-                </div>
-                <div class="input-group">
-                    <label>Nettó Veiðigjald (kr)</label>
-                    <input type="text" id="net-fee" disabled class="locked-input">
-                </div>
-            </div>
-
-            <div class="result-card fish-card">
-                <div>Veiðigjöld sem % af verðmæti</div>
-                <div class="big-percent" id="fish-percent">0.00%</div>
-                <div class="sub-value">Miðað við 2026 taxta fyrir þorsk og fulla nýtingu á frítekjumarki.</div>
-            </div>
-        </div>
-
-        <!-- KEG SECTION (REVERSE MODE) -->
-        <div id="keg-input-section" class="section hidden" style="border: 2px solid #ea580c;">
-            <div class="section-header">
-                <h2 class="section-title">🍺 Skemmtistaðurinn (Bjór)</h2>
-            </div>
-            <div class="input-grid">
-                <div class="input-group">
-                    <label>Fjöldi Bjórkúta (30L)</label>
-                    <input type="number" id="kegs-input" value="300" onkeyup="calcReverse()" placeholder="0"
-                        style="font-size: 1.2rem; font-weight: 700; color:#ea580c; border-color:#ea580c;">
-                </div>
-                <div class="input-group">
-                    <label>Söluvirði (kr)</label>
-                    <input type="text" id="kegs-sales-value" disabled class="locked-input">
-                </div>
-                <div class="input-group">
-                    <label>Áfengisgjald (kr)</label>
-                    <input type="text" id="kegs-tax-total" disabled class="locked-input">
-                </div>
-            </div>
-            <div class="result-card vs-card">
-                <div>Áfengisgjöld sem % af söluvirði</div>
-                <div class="big-percent" id="kegs-percent">0.00%</div>
-                <div class="sub-value" style="color:rgba(255,255,255,0.8)">(Miðað við útsöluverð 1.500 kr/0.5L)</div>
-            </div>
-        </div>
-
-        <!-- PUNCHLINE SECTION -->
-        <div class="section" style="border: 4px solid #ea580c; background: #fffaf0;" id="result-box">
-            <div class="section-header" style="border-bottom: none; margin-bottom: 10px;">
-                <h2 class="section-title" style="width:100%; text-align:center;">⚖️ Jafngildi</h2>
-            </div>
-
-            <div class="comparison-box" style="border:none; background:transparent; margin-top:0; padding-top:0;">
-                <p style="margin-bottom: 20px; font-size: 1.1rem; color: #4b5563;" id="comparison-text">
-                    Til að ríkið fái sömu tekjur í áfengisgjöld og útgerðin borgar af þessum afla...<br>
-                    ...þyrfti barinn að selja:
-                </p>
-
-                <!-- Normal Mode Result -->
-                <div id="normal-result">
-                    <div class="keg-icon">🛢️</div>
-                    <div class="equiv-line">
-                        <strong id="equiv-kegs">0</strong> bjórkúta (30L)
-                    </div>
-                </div>
-
-                <!-- Reverse Mode Result -->
-                <div id="reverse-result" class="hidden">
-                    <div class="keg-icon">🐟</div>
-                    <div class="equiv-line">
-                        Útgerðin þyrfti að veiða<br>
-                        <strong id="equiv-tonnes" style="color:#0ea5e9;">0</strong> tonn af þorski
-                    </div>
-                </div>
-
-                <div style="font-size: 1rem; color: #6b7280; margin-top:10px;">(Miðað við 5% ABV)</div>
-            </div>
-        </div>
-
-        <!-- ALCOHOL RATES REFERENCE -->
-        <div class="section">
-            <div class="section-header">
-                <h2 class="section-title">📊 Áfengisgjöld (Reiknivél)</h2>
-            </div>
-            <p style="margin-bottom: 20px; color: #4b5563;">Hér getur þú séð hvað ríkið tekur af hverri vörutegund miðað
-                við áætlað söluverð.</p>
-
-            <div class="input-grid">
-                <!-- BEER -->
-                <div class="input-group" style="background:#f9fafb; padding:15px; border-radius:10px;">
-                    <h4 style="margin-bottom:10px;">🍺 Bjór (5%)</h4>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span>Verð (0.5L):</span> <input type="number" value="1500" id="beer-price"
-                            onkeyup="calcRates()" style="width:80px; padding:6px;">
-                    </div>
-                    <div style="font-weight:700; color:#ea580c;" id="beer-tax-pct">Tax: 0%</div>
-                </div>
-
-                <!-- WINE -->
-                <div class="input-group" style="background:#f9fafb; padding:15px; border-radius:10px;">
-                    <h4 style="margin-bottom:10px;">🍷 Vín (12%)</h4>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span>Verð (0.75L):</span> <input type="number" value="2500" id="wine-price"
-                            onkeyup="calcRates()" style="width:80px; padding:6px;">
-                    </div>
-                    <div style="font-weight:700; color:#ea580c;" id="wine-tax-pct">Tax: 0%</div>
-                </div>
-
-                <!-- SPIRITS -->
-                <div class="input-group" style="background:#f9fafb; padding:15px; border-radius:10px;">
-                    <h4 style="margin-bottom:10px;">🥃 Sterkt (40%)</h4>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span>Verð (0.7L):</span> <input type="number" value="9000" id="spirits-price"
-                            onkeyup="calcRates()" style="width:80px; padding:6px;">
-                    </div>
-                    <div style="font-weight:700; color:#ea580c;" id="spirits-tax-pct">Tax: 0%</div>
-                </div>
-            </div>
-        </div>
-
-
-        <p class="disclaimer">
-            <strong>Forsendur (2026):</strong><br>
-            Þorskur: Verð 405,15 kr/kg. Veiðigjald 50,79 kr/kg. Frítekjumark nýtt að fullu (65%/45% reglur).<br>
-            Áfengisgjald: Bjór 156,45 kr/cl, Vín 142,50 kr/cl, Sterkt 192,85 kr/cl.<br>
-            Þetta er einföldun, en sýnir stærðargráðuna.
-        </p>
-
+    <!-- SHARED REVENUE -->
+    <div class="revenue-pill">
+        <span class="revenue-label">Ríkið fær:</span>
+        <span id="state-revenue">0 kr.</span>
     </div>
 
+    <!-- CENTRAL BADGE -->
+    <div class="equalizer">=</div>
+
+    <div class="wrapper">
+        <!-- BAR SIDE -->
+        <div class="side side-bar">
+            <h1>🍺 Barinn...</h1>
+
+            <div class="input-group">
+                <label>Selur þetta marga Bjórkúta (30L)</label>
+                <input type="number" id="input-kegs" value="300" placeholder="0">
+            </div>
+
+            <div class="metrics">
+                <div class="metric-row">
+                    <span>Söluvirði (án VSK):</span>
+                    <span class="metric-val" id="bar-sales">0 kr.</span>
+                </div>
+                <div class="metric-row" style="color:#ea580c;">
+                    <span>Áfengisgjald:</span>
+                    <span class="metric-val" id="bar-tax">0 kr.</span>
+                </div>
+                <div class="metric-row" style="font-size:0.9rem; opacity:0.6; margin-top:5px;">
+                    <span>Hlutfall:</span>
+                    <span class="metric-val" id="bar-pct">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOAT SIDE -->
+        <div class="side side-boat">
+            <h1>...vs Útgerðin 🐟</h1>
+
+            <div class="input-group">
+                <label>Veiðir þetta mörg Tonn af Þorski</label>
+                <input type="number" id="input-tons" placeholder="0">
+            </div>
+
+            <div class="metrics">
+                <div class="metric-row">
+                    <span>Aflaverðmæti:</span>
+                    <span class="metric-val" id="boat-sales">0 kr.</span>
+                </div>
+                <div class="metric-row" style="color:#0ea5e9;">
+                    <span>Veiðigjöld (net):</span>
+                    <span class="metric-val" id="boat-tax">0 kr.</span>
+                </div>
+                <div class="metric-row" style="font-size:0.9rem; opacity:0.6; margin-top:5px;">
+                    <span>Hlutfall:</span>
+                    <span class="metric-val" id="boat-pct">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="disclaimer-footer">
+        <div class="beer-decoration">🍻</div>
+        <div class="disclaimer-content">
+            <div class="disclaimer-title">Um útreikningana</div>
+            <p>
+                Allar tölur í samanburðinum eru reiknaðar samkvæmt gildandi reglum:
+                veiðigjöld með frítekjumörkum og afsláttum, og áfengisgjöld samkvæmt lögbundnum taxta.
+                Engar tölur eru “valdar” — þær eru reiknaðar.
+            </p>
+            <p style="margin-top:10px; color:#d1d5db; font-size:1.1rem; font-weight:700;">
+                Ef þú ert ósammála forsendum geturðu breytt þeim sjálfur í reiknivélunum hér á síðunni.
+                Hlutföllin breytast aðeins ef veruleikinn breytist.
+            </p>
+            <p style="margin-top:15px; font-style:italic; opacity:0.6; font-size:0.9rem;">
+                Þetta er ekki pólitísk fullyrðing. Þetta er bara margföldun.
+                Reiknivélin móðgast ekki.
+            </p>
+        </div>
+    </footer>
+
     <script>
-        const fmt = (n) => Math.round(n).toLocaleString('is-IS');
-        const parse = (id) => parseFloat(document.getElementById(id).value) || 0;
+        // --- CONSTANTS (2026) ---
+        const COD_PRICE = 405.15; // kr/kg
+        const COD_FEE_RATE = 50.79; // kr/kg (Gross)
 
-        // 2026 CONSTANTS
-        const COD_PRICE = 405.15;
-        const COD_FEE_RATE = 50.79;
-
-        const RATE_BEER = 156.45;
-        const RATE_WINE = 142.50;
-        const RATE_SPIRITS = 192.85;
-
-        // KEG CONSTANTS
+        // Alcohol
+        const RATE_BEER = 156.45; // kr per cl of pure alcohol
         const KEG_LITERS = 30;
-        const KEG_ABV = 5.0; // 5%
-        // calc tax per keg once
-        const KEG_TAX_PER_KEG = KEG_LITERS * KEG_ABV * RATE_BEER; // 30 * 5 * 156.45 = 23467.5
+        const KEG_ABV = 5.0;
+        const KEG_TAX_PER_KEG = KEG_LITERS * KEG_ABV * RATE_BEER; // ~23,467 kr
 
-        // Retail estimates
+        // Retail Estimations
         const RETAIL_PRICE_PER_PINT = 1500; // 0.5L
-        const RETAIL_PRICE_PER_KEG = (KEG_LITERS / 0.5) * RETAIL_PRICE_PER_PINT; // 60 pints * 1500 = 90,000 kr
+        const PINTS_PER_KEG = KEG_LITERS / 0.5;
+        const SALES_PER_KEG = PINTS_PER_KEG * RETAIL_PRICE_PER_PINT; // 90,000 kr
 
-        // Default to Reverse Mode (Kegs -> Cod) as per user request
-        let isReverse = true;
+        // --- ELEMENTS ---
+        const elKegs = document.getElementById('input-kegs');
+        const elTons = document.getElementById('input-tons');
 
-        function toggleMode() {
-            isReverse = !isReverse;
-            renderMode();
-        }
+        const elBarSales = document.getElementById('bar-sales');
+        const elBarTax = document.getElementById('bar-tax');
+        const elBarPct = document.getElementById('bar-pct');
 
-        function renderMode() {
-            const fishSection = document.getElementById('fishing-input-section');
-            const kegSection = document.getElementById('keg-input-section');
-            const normalResult = document.getElementById('normal-result');
-            const reverseResult = document.getElementById('reverse-result');
-            const subtitle = document.getElementById('subtitle-text');
-            const resultBox = document.getElementById('result-box');
+        const elBoatSales = document.getElementById('boat-sales');
+        const elBoatTax = document.getElementById('boat-tax');
+        const elBoatPct = document.getElementById('boat-pct');
 
-            if (isReverse) {
-                // ESTABLISHED DEFAULT: KEG INPUT
-                fishSection.classList.add('hidden');
-                kegSection.classList.remove('hidden');
-                normalResult.classList.add('hidden');
-                reverseResult.classList.remove('hidden');
+        const elStateRevenue = document.getElementById('state-revenue');
 
-                subtitle.innerText = "Hversu mikið þarf útgerðin að veiða til að borga sömu skatta og barinn?";
-                resultBox.style.borderColor = "#0ea5e9";
+        // --- FORMATTER ---
+        const fmt = (n) => new Intl.NumberFormat('is-IS').format(Math.round(n));
 
-                document.getElementById('comparison-text').innerHTML =
-                    "Til að ríkið fái sömu tekjur í veiðigjöld og barinn skilar af þessu magni...<br>...þyrfti útgerðin að veiða:";
+        // --- LOGIC ---
 
-                calcReverse();
-            } else {
-                // TOGGLED: FISH INPUT
-                fishSection.classList.remove('hidden');
-                kegSection.classList.add('hidden');
-                normalResult.classList.remove('hidden');
-                reverseResult.classList.add('hidden');
-
-                subtitle.innerText = "Hvað þarf marga bjórkúta til að borga sömu skatta?";
-                resultBox.style.borderColor = "#ea580c";
-
-                document.getElementById('comparison-text').innerHTML =
-                    "Til að ríkið fái sömu tekjur í áfengisgjöld og útgerðin borgar af þessum afla...<br>...þyrfti barinn að selja:";
-
-                calc();
-            }
-        }
-
-        // ... (calc functions remain the same) ...
-
-        // Helper to calc net fee from tonnes (used in binary search)
         function calculateNetFee(tonnes) {
             const kg = tonnes * 1000;
             const grossFee = kg * COD_FEE_RATE;
 
+            // Allowance logic
             let allowance = 0;
             const tier1 = Math.min(grossFee, 15_000_000);
             allowance += tier1 * 0.65;
@@ -503,99 +486,80 @@
             return Math.max(0, grossFee - allowance);
         }
 
-        function calc() {
-            // 1. FISHING CALC (Normal Mode)
-            const tonnes = parse('cod-tonnes');
-            const kg = tonnes * 1000;
-            const catchValue = kg * COD_PRICE;
-            const netFee = calculateNetFee(tonnes); // use helper
+        // Binary Search to find Tonnes needed for a specific Target Fee
+        function findTonnesForFee(targetFee) {
+            let low = 0, high = 200000; // 200k tons is massive, safe upper bound
+            let found = 0;
 
-            // Update UI
-            document.getElementById('catch-value').value = fmt(catchValue) + ' kr';
-            document.getElementById('net-fee').value = fmt(netFee) + ' kr';
-
-            let fishPct = 0;
-            if (catchValue > 0) fishPct = (netFee / catchValue) * 100;
-            document.getElementById('fish-percent').innerText = fishPct.toFixed(2) + '%';
-
-            // 2. EQUIVALENCY (KEGS)
-            let kegs = 0;
-            if (netFee > 0) {
-                kegs = netFee / KEG_TAX_PER_KEG;
-            }
-            document.getElementById('equiv-kegs').innerText = fmt(kegs);
-        }
-
-        function calcReverse() {
-            // 1. KEG INPUT (Reverse Mode)
-            const kegs = parse('kegs-input');
-
-            // Stats
-            const totalTax = kegs * KEG_TAX_PER_KEG;
-            const salesValue = kegs * RETAIL_PRICE_PER_KEG;
-
-            let taxPct = 0;
-            if (salesValue > 0) taxPct = (totalTax / salesValue) * 100;
-
-            document.getElementById('kegs-sales-value').value = fmt(salesValue) + ' kr';
-            document.getElementById('kegs-tax-total').value = fmt(totalTax) + ' kr';
-            document.getElementById('kegs-percent').innerText = taxPct.toFixed(1) + '%';
-
-            // 2. FIND TONNES needed to generate 'totalTax'
-            // Since fee calculation is non-linear (tiers), we iterate or solve.
-            // Function is monotonic increasing, so binary search fits.
-            // Max typical fee? 
-            // 1 ton cod ~ 400kg fee -> 20k fee approx.
-            // 10,000 tons -> 200m fee.
-            // Let's search 0 to 100,000 tons.
-
-            let low = 0;
-            let high = 100000;
-            let foundTonnes = 0;
-
-            for (let i = 0; i < 50; i++) { // 50 iter ample precision
+            // 50 iterations is plenty for precision
+            for (let i = 0; i < 50; i++) {
                 const mid = (low + high) / 2;
                 const fee = calculateNetFee(mid);
 
-                if (Math.abs(fee - totalTax) < 100) { // close enough result
-                    foundTonnes = mid;
-                    break;
-                }
+                if (Math.abs(fee - targetFee) < 100) return mid;
 
-                if (fee < totalTax) {
-                    low = mid;
-                } else {
-                    high = mid;
-                }
-                foundTonnes = mid;
+                if (fee < targetFee) low = mid;
+                else high = mid;
+
+                found = mid;
             }
-
-            document.getElementById('equiv-tonnes').innerText = fmt(foundTonnes);
+            return found;
         }
 
-        function calcRates() {
-            // Beer
-            const bPrice = parse('beer-price'); // 0.5L
-            const bTax = 0.5 * 5.0 * RATE_BEER;
-            const bPct = (bTax / bPrice) * 100;
-            document.getElementById('beer-tax-pct').innerText = `Gjald: ${bPct.toFixed(1)}%`;
+        function updateBarStats(kegs) {
+            const sales = kegs * SALES_PER_KEG;
+            const tax = kegs * KEG_TAX_PER_KEG;
 
-            // Wine
-            const wPrice = parse('wine-price'); // 0.75L
-            const wTax = 0.75 * 12.0 * RATE_WINE;
-            const wPct = (wTax / wPrice) * 100;
-            document.getElementById('wine-tax-pct').innerText = `Gjald: ${wPct.toFixed(1)}%`;
+            elBarSales.textContent = fmt(sales) + ' kr.';
+            elBarTax.textContent = fmt(tax) + ' kr.';
+            elBarPct.textContent = sales > 0 ? (tax / sales * 100).toFixed(1) + '%' : '0%';
 
-            // Spirits
-            const sPrice = parse('spirits-price'); // 0.7L
-            const sTax = 0.7 * 40.0 * RATE_SPIRITS;
-            const sPct = (sTax / sPrice) * 100;
-            document.getElementById('spirits-tax-pct').innerText = `Gjald: ${sPct.toFixed(1)}%`;
+            return tax; // Return the tax generated
         }
+
+        function updateBoatStats(tons) {
+            const kg = tons * 1000;
+            const sales = kg * COD_PRICE;
+            const tax = calculateNetFee(tons);
+
+            elBoatSales.textContent = fmt(sales) + ' kr.';
+            elBoatTax.textContent = fmt(tax) + ' kr.';
+            elBoatPct.textContent = sales > 0 ? (tax / sales * 100).toFixed(1) + '%' : '0%';
+
+            return tax;
+        }
+
+        function onKegsChange() {
+            const kegs = parseFloat(elKegs.value) || 0;
+            const revenue = updateBarStats(kegs);
+
+            // Sync Boat
+            const tonsNeeded = findTonnesForFee(revenue);
+            elTons.value = Math.round(tonsNeeded); // Round for cleaner input
+
+            updateBoatStats(tonsNeeded);
+            elStateRevenue.innerText = fmt(revenue) + ' kr.';
+        }
+
+        function onTonsChange() {
+            const tons = parseFloat(elTons.value) || 0;
+            const revenue = updateBoatStats(tons);
+
+            // Sync Bar
+            const kegsNeeded = revenue / KEG_TAX_PER_KEG;
+            elKegs.value = Math.round(kegsNeeded);
+
+            updateBarStats(kegsNeeded);
+            elStateRevenue.innerText = fmt(revenue) + ' kr.';
+        }
+
+        // --- EVENTS ---
+        elKegs.addEventListener('input', onKegsChange);
+        elTons.addEventListener('input', onTonsChange);
 
         // Init
-        calc();
-        calcRates();
+        onKegsChange(); // Default to whatever is in Kegs input (300)
+
     </script>
 </body>
 
