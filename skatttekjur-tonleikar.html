@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="is">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skatttekjur af Tónleikum - Reiknivél</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #1f2937;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: backgroundMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeInDown 0.6s ease-out 0.1s backwards;
+        }
+
+        .info-banner {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 5px solid #3b82f6;
+            padding: 16px 24px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease-out 0.2s backwards;
+            flex-wrap: wrap;
+        }
+
+        .info-banner span {
+            font-size: 1rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .info-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            white-space: nowrap;
+        }
+
+        .info-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 28px;
+            color: #374151;
+            line-height: 1.7;
+        }
+
+        .modal-body h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        .modal-body h4:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 35px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.3s backwards;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .section:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .section:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .section:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: end;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .row-wages {
+            grid-template-columns: 2fr 1fr 1fr auto;
+        }
+
+        .row-vat {
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+        }
+
+        .row-alcohol {
+            grid-template-columns: 1fr 1fr 1fr 1.5fr auto;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        input,
+        select {
+            padding: 12px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input:hover,
+        select:hover {
+            border-color: #cbd5e1;
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+            font-weight: 700;
+        }
+
+        .remove-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .results .result-card:nth-child(1) {
+            animation-delay: 0.7s;
+        }
+
+        .results .result-card:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+
+        .results .result-card:nth-child(3) {
+            animation-delay: 0.9s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-card.total {
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card.total::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .result-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-card.total h3 {
+            border-bottom-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-line.total-line {
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .result-card.total .result-line.total-line {
+            border-top-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .vat-detail {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .row,
+            .row-wages,
+            .row-vat,
+            .row-alcohol {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .result-card {
+                padding: 24px;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎵 Skatttekjur af Tónleikum</h1>
+        <p class="subtitle">Reiknivél fyrir beinar skatttekjur ríkis og sveitarfélaga</p>
+
+        <div class="info-banner">
+            <span>💡 Áætlaðir útreikningar miðað við 2026 forsendur</span>
+            <button class="info-btn" onclick="toggleModal()">ℹ️ Sjá nánar</button>
+        </div>
+
+        <!-- Modal Popup -->
+        <div id="infoModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚠️ Forsendur og Fyrirvari</h3>
+                    <button class="modal-close" onclick="toggleModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <h4>Skattalegar forsendur:</h4>
+                    <ul>
+                        <li><strong>Meðalútsvar:</strong> 14,94%</li>
+                        <li><strong>Lægsta staðgreiðsluþrep:</strong> 31,49%</li>
+                        <li><strong>Tryggingagjald:</strong> 6,35%</li>
+                    </ul>
+
+                    <h4>Áfengisgjöld 2026 (kr per cl vínanda):</h4>
+                    <ul>
+                        <li><strong>Bjór:</strong> 156,45 kr/cl</li>
+                        <li><strong>Vín:</strong> 142,50 kr/cl</li>
+                        <li><strong>Sterkt áfengi:</strong> 192,85 kr/cl</li>
+                    </ul>
+
+                    <h4>Mikilvægt að hafa í huga:</h4>
+                    <ul>
+                        <li>Rauntölur ráðast af skattkortum einstaklinga, öðrum tekjum og VSK-skilum.</li>
+                        <li>VSK er sýndur sem <strong>nettó</strong> (útskattur mínus innskattur).</li>
+                        <li>Persónuafsláttur er einfaldaður - settu inn upphæð sem notuð er á hvern launalið.</li>
+                        <li>Þetta er áætlun til viðmiðunar, ekki endanleg skattaútreikningur.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="loadExample()">📋 Hlaða Dæmi</button>
+            <button class="btn btn-secondary" onclick="resetAll()">🔄 Hreinsa Allt</button>
+        </div>
+
+        <!-- LAUN -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">💰 Laun</h2>
+            </div>
+            <div id="wages-container"></div>
+        </div>
+
+        <!-- ÁFENGI -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🍺 Áfengi</h2>
+            </div>
+            <div id="alcohol-container"></div>
+        </div>
+
+        <!-- VSK -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🧾 VSK (Virðisaukaskattur)</h2>
+            </div>
+            <div id="vat-container"></div>
+        </div>
+
+        <!-- NIÐURSTÖÐUR -->
+        <div class="results" id="results">
+            <div class="result-card">
+                <h3>🏛️ Ríkið</h3>
+                <div class="result-line">
+                    <span>Tekjuskattur (ríkishluti):</span>
+                    <span class="result-value" id="state-income">0 kr</span>
+                </div>
+                <div class="result-line">
+                    <span>Tryggingagjald:</span>
+                    <span class="result-value" id="state-payroll">0 kr</span>
+                </div>
+                <div class="result-line">
+                    <span>Nettó VSK:</span>
+                    <span class="result-value" id="state-vat">0 kr</span>
+                </div>
+                <div class="result-line">
+                    <span>Áfengisgjald:</span>
+                    <span class="result-value" id="state-alcohol">0 kr</span>
+                </div>
+                <div class="result-line total-line">
+                    <span>Ríkið samtals:</span>
+                    <span class="result-value" id="state-total">0 kr</span>
+                </div>
+                <div class="vat-detail" id="vat-breakdown"></div>
+            </div>
+
+            <div class="result-card">
+                <h3>🏘️ Sveitarfélag</h3>
+                <div class="result-line">
+                    <span>Útsvar:</span>
+                    <span class="result-value" id="municipal-tax">0 kr</span>
+                </div>
+                <div class="result-line total-line">
+                    <span>Sveitarfélag samtals:</span>
+                    <span class="result-value" id="municipal-total">0 kr</span>
+                </div>
+            </div>
+
+            <div class="result-card total">
+                <h3>📊 Samtals Skatttekjur</h3>
+                <div class="result-line total-line">
+                    <span>Heildarskatttekjur:</span>
+                    <span class="result-value" id="grand-total">0 kr</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // FORSENDUR (2026 DEFAULTS)
+        // ========================================
+        const HEILD_STADGREIDSLA = 0.3149;      // 31.49% heildar staðgreiðsla
+        const MEDAL_UTSVAR = 0.1494;            // 14.94% meðalútsvar
+        const RIKISHLUTI_STADGREIDSLA = HEILD_STADGREIDSLA - MEDAL_UTSVAR; // 0.1655
+        const TRYGGINGAGJALD = 0.0635;          // 6.35% tryggingagjald launagreiðanda
+
+        // Áfengisgjöld 2026: kr per cl vínanda í 1 lítra drykkjar
+        const BEER_RATE_PER_CL = 156.45;      // 1. tölul. - Bjór
+        const WINE_RATE_PER_CL = 142.50;      // 2. tölul. - Vín
+        const SPIRITS_RATE_PER_CL = 192.85;   // 3. tölul. - Sterkt áfengi
+
+        // ========================================
+        // DATA STRUCTURES (Legacy - kept for compatibility)
+        // ========================================
+        let wageRows = [];
+        let vatRows = [];
+
+        // ========================================
+        // FORMATTING HELPER
+        // ========================================
+        function formatCurrency(amount) {
+            return Math.round(amount).toLocaleString('is-IS') + ' kr';
+        }
+
+        function parseNumber(str) {
+            return parseFloat(str.replace(/[^\d.-]/g, '')) || 0;
+        }
+
+        // ========================================
+        // FIXED WAGE CATEGORIES
+        // ========================================
+        let wages = {
+            listafólk: { amount: 0, personalAllowance: 0 },
+            hljóðmaður: { amount: 0, personalAllowance: 0 },
+            starfsfólk: { amount: 0, personalAllowance: 0 },
+            þrif: { amount: 0, personalAllowance: 0 }
+        };
+
+        function renderWages() {
+            const container = document.getElementById('wages-container');
+            container.innerHTML = '';
+
+            const categories = [
+                { key: 'listafólk', label: 'Listafólk' },
+                { key: 'hljóðmaður', label: 'Hljóðmaður' },
+                { key: 'starfsfólk', label: 'Starfsfólk' },
+                { key: 'þrif', label: 'Þrif' }
+            ];
+
+            categories.forEach(cat => {
+                const row = wages[cat.key];
+                const div = document.createElement('div');
+                div.className = 'row row-wages';
+                div.innerHTML = `
+                    <div class="input-group">
+                        <label>${cat.label}</label>
+                        <input type="text" value="${cat.label}" disabled
+                               style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                    </div>
+                    <div class="input-group">
+                        <label>Upphæð (kr)</label>
+                        <input type="number" value="${row.amount}" 
+                               onchange="updateWage('${cat.key}', 'amount', parseFloat(this.value) || 0)">
+                    </div>
+                    <div class="input-group">
+                        <label>Persónuafsláttur notaður (kr)</label>
+                        <input type="number" value="${row.personalAllowance}" 
+                               onchange="updateWage('${cat.key}', 'personalAllowance', parseFloat(this.value) || 0)">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateWage(key, field, value) {
+            wages[key][field] = value;
+            calculate();
+        }
+
+        // ========================================
+        // FIXED VSK CATEGORIES
+        // ========================================
+        let vsk = {
+            leiga: { amount: 0, vskRate: 0.24 }
+        };
+
+        function renderVAT() {
+            const container = document.getElementById('vat-container');
+            container.innerHTML = '';
+
+            // 1. Leiga á búnaði (manual input, innskattur)
+            const leigaVSK = vsk.leiga.amount * 0.24;
+            const leigaTotal = vsk.leiga.amount + leigaVSK;
+
+            let div = document.createElement('div');
+            div.className = 'row row-vat';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>Leiga á búnaði (24%)</label>
+                    <input type="text" value="Leiga á búnaði" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Upphæð án VSK (kr)</label>
+                    <input type="number" value="${vsk.leiga.amount}" 
+                           onchange="updateVSK('leiga', 'amount', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>VSK upphæð (kr)</label>
+                    <input type="text" value="${formatCurrency(leigaVSK)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Samtals með VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(leigaTotal)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+
+            // 2. Hljóðmaður (auto from wages, innskattur)
+            const hljóðmaðurAmount = wages.hljóðmaður.amount;
+            const hljóðmaðurVSK = hljóðmaðurAmount * 0.24;
+            const hljóðmaðurTotal = hljóðmaðurAmount + hljóðmaðurVSK;
+
+            div = document.createElement('div');
+            div.className = 'row row-vat';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>Hljóðmaður (24%)</label>
+                    <input type="text" value="Hljóðmaður" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Upphæð án VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(hljóðmaðurAmount)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>VSK upphæð (kr)</label>
+                    <input type="text" value="${formatCurrency(hljóðmaðurVSK)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Samtals með VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(hljóðmaðurTotal)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+
+            // 3. Matur & Drykkur (auto from alcohol sales, útskattur)
+            const bjórRevenue = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
+            const sterktRevenue = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
+            const vínRevenue = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
+            const totalAlcoholRevenue = bjórRevenue + sterktRevenue + vínRevenue;
+
+            // Revenue includes 11% VSK, so base = revenue / 1.11
+            const alcoholBase = totalAlcoholRevenue / 1.11;
+            const alcoholVSK = totalAlcoholRevenue - alcoholBase;
+
+            div = document.createElement('div');
+            div.className = 'row row-vat';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>Matur & Drykkur (11%)</label>
+                    <input type="text" value="Matur & Drykkur" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Upphæð án VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(alcoholBase)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>VSK upphæð (kr)</label>
+                    <input type="text" value="${formatCurrency(alcoholVSK)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Samtals með VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(totalAlcoholRevenue)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function updateVSK(key, field, value) {
+            vsk[key][field] = value;
+            calculate();
+        }
+
+        // ========================================
+        // FIXED ALCOHOL CATEGORIES
+        // ========================================
+        let alcohol = {
+            bjór: { pints: 0, pricePerPint: 0, abv: 4.5 },        // 1 pint = 0.5L
+            sterkt: { shots: 0, pricePerShot: 0, abv: 40.0 },     // 1 shot = 3cl
+            vín: { bottles: 0, pricePerBottle: 0, abv: 12.5 }     // 1 bottle = 750ml
+        };
+
+        function renderAlcohol() {
+            const container = document.getElementById('alcohol-container');
+            container.innerHTML = '';
+
+            // Bjór (pints)
+            const bjórLiters = alcohol.bjór.pints * 0.5;
+            const bjórExcise = bjórLiters * alcohol.bjór.abv * BEER_RATE_PER_CL;
+            const bjórRevenue = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
+
+            let div = document.createElement('div');
+            div.className = 'row row-alcohol';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>Bjór (4.5% ABV)</label>
+                    <input type="text" value="Bjór" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Pints (0.5L)</label>
+                    <input type="number" value="${alcohol.bjór.pints}" step="1"
+                           onchange="updateAlcohol('bjór', 'pints', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Verð/pint (kr)</label>
+                    <input type="number" value="${alcohol.bjór.pricePerPint}" step="1"
+                           onchange="updateAlcohol('bjór', 'pricePerPint', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Áætlað áfengisgjald</label>
+                    <input type="text" value="${formatCurrency(bjórExcise)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+
+            // Sterkt (shots/einfaldir)
+            const sterktLiters = alcohol.sterkt.shots * 0.03;
+            const sterktExcise = sterktLiters * alcohol.sterkt.abv * SPIRITS_RATE_PER_CL;
+            const sterktRevenue = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
+
+            div = document.createElement('div');
+            div.className = 'row row-alcohol';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>Sterkt áfengi (40% ABV)</label>
+                    <input type="text" value="Sterkt áfengi" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Einfaldir (3cl)</label>
+                    <input type="number" value="${alcohol.sterkt.shots}" step="1"
+                           onchange="updateAlcohol('sterkt', 'shots', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Verð/einfaldur (kr)</label>
+                    <input type="number" value="${alcohol.sterkt.pricePerShot}" step="1"
+                           onchange="updateAlcohol('sterkt', 'pricePerShot', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Áætlað áfengisgjald</label>
+                    <input type="text" value="${formatCurrency(sterktExcise)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+
+            // Vín (bottles)
+            const vínLiters = alcohol.vín.bottles * 0.75; // 750ml per bottle
+            const vínExcise = vínLiters * alcohol.vín.abv * WINE_RATE_PER_CL;
+            const vínRevenue = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
+
+            div = document.createElement('div');
+            div.className = 'row row-alcohol';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label>Vín (12.5% ABV)</label>
+                    <input type="text" value="Vín" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+                <div class="input-group">
+                    <label>Flöskur (750ml)</label>
+                    <input type="number" value="${alcohol.vín.bottles}" step="1"
+                           onchange="updateAlcohol('vín', 'bottles', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Verð/flösku (kr)</label>
+                    <input type="number" value="${alcohol.vín.pricePerBottle}" step="1"
+                           onchange="updateAlcohol('vín', 'pricePerBottle', parseFloat(this.value) || 0)">
+                </div>
+                <div class="input-group">
+                    <label>Áætlað áfengisgjald</label>
+                    <input type="text" value="${formatCurrency(vínExcise)}" disabled
+                           style="background: #f3f4f6; cursor: not-allowed; font-weight: 600;">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function updateAlcohol(key, field, value) {
+            alcohol[key][field] = value;
+            renderAlcohol();
+            renderVAT(); // Update VSK to show alcohol revenue
+            calculate();
+        }
+
+
+        // ========================================
+        // CALCULATIONS
+        // ========================================
+        function calculate() {
+            // A) LAUN (Income Tax, Municipal Tax, Payroll Tax)
+            let stateIncome = 0;
+            let statePayroll = 0;
+            let municipalTax = 0;
+
+            Object.values(wages).forEach(row => {
+                const amount = row.amount;
+                const personalAllowance = row.personalAllowance;
+
+                // Gross tax before personal allowance
+                const grossTax = amount * HEILD_STADGREIDSLA;
+
+                // Net tax after personal allowance (cannot go below 0)
+                const netTax = Math.max(0, grossTax - personalAllowance);
+
+                // Ratios for splitting net tax
+                const municipalRatio = MEDAL_UTSVAR / HEILD_STADGREIDSLA;
+                const stateRatio = RIKISHLUTI_STADGREIDSLA / HEILD_STADGREIDSLA;
+
+                // Split net tax
+                const municipalFromWage = netTax * municipalRatio;
+                const stateIncomeFromWage = netTax * stateRatio;
+
+                // Payroll tax (always on full amount, no personal allowance)
+                const statePayrollFromWage = amount * TRYGGINGAGJALD;
+
+                municipalTax += municipalFromWage;
+                stateIncome += stateIncomeFromWage;
+                statePayroll += statePayrollFromWage;
+            });
+
+            // B) VSK
+            let outputVAT = 0;
+            let inputVAT = 0;
+
+            // 1. Leiga á búnaði (innskattur)
+            inputVAT += vsk.leiga.amount * 0.24;
+
+            // 2. Matur & Drykkur from alcohol (útskattur)
+            const bjórRevenue = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
+            const sterktRevenue = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
+            const vínRevenue = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
+            const totalAlcoholRevenue = bjórRevenue + sterktRevenue + vínRevenue;
+
+            // Revenue includes 11% VSK: base = revenue / 1.11
+            const alcoholBase = totalAlcoholRevenue / 1.11;
+            const alcoholVAT = totalAlcoholRevenue - alcoholBase;
+            outputVAT += alcoholVAT;
+
+            // Net VSK (Output - Input)
+            // If Net is positive, you pay. If negative, you get a refund (or treated as 0 for "revenue" context usually, but here 'Nettó VSK' might be negative)
+            // Let's keep it simple: Nettó = Útskattur - Innskattur.
+            const netVAT = outputVAT - inputVAT;
+
+
+            // C) ÁFENGI (Excise Duty)
+            let alcoholExcise = 0;
+
+            // Bjór
+            const bjórLiters = alcohol.bjór.pints * 0.5;
+            alcoholExcise += bjórLiters * alcohol.bjór.abv * BEER_RATE_PER_CL;
+
+            // Sterkt
+            const sterktLiters = alcohol.sterkt.shots * 0.03;
+            alcoholExcise += sterktLiters * alcohol.sterkt.abv * SPIRITS_RATE_PER_CL;
+
+            // Vín (bottles to liters)
+            const vínLiters = alcohol.vín.bottles * 0.75;
+            alcoholExcise += vínLiters * alcohol.vín.abv * WINE_RATE_PER_CL;
+
+            // D) SAMTÖLUR
+            // Ríkið fær: Tekjuskattur + Tryggingagjald + Nettó VSK + Áfengisgjald
+            // (Ath: Ef nettó VSK er neikvæð, þá lækkar greiðsla til ríkis)
+            const stateTotal = stateIncome + statePayroll + netVAT + alcoholExcise;
+
+            // Sveitarfélag fær: Útsvar
+            const municipalTotal = municipalTax;
+
+            // Grand Total
+            const grandTotal = stateTotal + municipalTotal;
+
+            // UPDATE UI
+            document.getElementById('state-income').textContent = formatCurrency(stateIncome);
+            document.getElementById('state-payroll').textContent = formatCurrency(statePayroll);
+            document.getElementById('state-vat').textContent = formatCurrency(netVAT);
+            document.getElementById('state-alcohol').textContent = formatCurrency(alcoholExcise);
+            document.getElementById('state-total').textContent = formatCurrency(stateTotal);
+
+            document.getElementById('municipal-tax').textContent = formatCurrency(municipalTax);
+            document.getElementById('municipal-total').textContent = formatCurrency(municipalTotal);
+
+            document.getElementById('grand-total').textContent = formatCurrency(grandTotal);
+
+            // VAT breakdown details
+            const vatBreakdown = `
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e5e7eb; font-size: 0.9em; color: #6b7280;">
+                    <strong>Sundurliðun VSK:</strong><br>
+                    <div style="display: flex; justify-content: space-between;"><span>Útskattur (sala):</span> <span>${formatCurrency(outputVAT)}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Innskattur (aðföng):</span> <span>-${formatCurrency(inputVAT)}</span></div>
+                </div>
+            `;
+            document.getElementById('vat-breakdown').innerHTML = vatBreakdown;
+        }
+
+        // ========================================
+        // EXAMPLE & RESET
+        // ========================================
+        function loadExample() {
+            // Reset fixed structures
+            wages.listafólk = { amount: 600000, personalAllowance: 0 };
+            wages.hljóðmaður = { amount: 120000, personalAllowance: 0 };
+            wages.starfsfólk = { amount: 200000, personalAllowance: 0 };
+            wages.þrif = { amount: 0, personalAllowance: 0 };
+
+            alcohol.bjór = { pints: 60, pricePerPint: 1200, abv: 4.5 };
+            alcohol.sterkt = { shots: 100, pricePerShot: 1500, abv: 40.0 };
+            alcohol.vín = { bottles: 10, pricePerBottle: 5000, abv: 12.5 };
+
+            vsk.leiga = { amount: 300000, vskRate: 0.24 };
+
+            renderWages();
+            renderAlcohol();
+            renderVAT();
+            calculate();
+        }
+
+
+        function resetAll() {
+            // Reset all fixed structures to zero
+            wages.listafólk = { amount: 0, personalAllowance: 0 };
+            wages.hljóðmaður = { amount: 0, personalAllowance: 0 };
+            wages.starfsfólk = { amount: 0, personalAllowance: 0 };
+            wages.þrif = { amount: 0, personalAllowance: 0 };
+
+            alcohol.bjór = { pints: 0, pricePerPint: 0, abv: 4.5 };
+            alcohol.sterkt = { shots: 0, pricePerShot: 0, abv: 40.0 };
+            alcohol.vín = { bottles: 0, pricePerBottle: 0, abv: 12.5 };
+
+            vsk.leiga = { amount: 0, vskRate: 0.24 };
+
+            renderWages();
+            renderAlcohol();
+            renderVAT();
+            calculate();
+        }
+
+        // ========================================
+        // MODAL TOGGLE
+        // ========================================
+        function toggleModal() {
+            const modal = document.getElementById('infoModal');
+            modal.classList.toggle('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // ========================================
+        // INITIALIZE
+        // ========================================
+        renderWages();
+        renderAlcohol();
+        renderVAT();
+        calculate();
+    </script>
+</body>
+
+</html>
