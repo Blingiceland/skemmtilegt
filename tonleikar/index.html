@@ -1145,16 +1145,110 @@
             const vínLiters = alcohol.vín.bottles * 0.75;
             alcoholExcise += vínLiters * alcohol.vín.abv * WINE_RATE_PER_CL;
 
+
             // D) SAMTÖLUR
             // Ríkið fær: Tekjuskattur + Tryggingagjald + Nettó VSK + Áfengisgjald
-            // (Ath: Ef nettó VSK er neikvæð, þá lækkar greiðsla til ríkis)
             const stateTotal = stateIncome + statePayroll + netVAT + alcoholExcise;
 
             // Sveitarfélag fær: Útsvar
             const municipalTotal = municipalTax;
 
-            // Grand Total
+            // Grand Total (Taxes)
             const grandTotal = stateTotal + municipalTotal;
+
+            // E) SJÓÐUR & HLUTFÖLL (Retained Earnings)
+            // Total Revenue (inc VSK)
+            // Need to sum sources. 
+            // - Leiga revenue is typically B2B (so we assume it was an income). But wait, leiga is usually an expense input for the event holder.
+            // Let's assume for this calculator:
+            // Revenue Sources = Alcohol Sales (inc VSK) + Ticket Sales (implicit? No ticket sales input yet).
+            // Actually, the calculator doesn't have "Ticket Revenue" input, only Expense Inputs (Wages, Rent) and Alcohol Revenue.
+            // So "Total Revenue" for this specific context = Alcohol Revenue.
+            // Expenses = Gross Wages + Gross Rent (inc VSK).
+
+            // Expenses:
+            let totalGrossWages = 0;
+            Object.values(wages).forEach(row => totalGrossWages += row.amount); // These are gross wage costs
+
+            const totalGrossRent = vsk.leiga.amount * 1.24; // Rent + 24% VSK
+
+            // Alcohol Revenue (Gross)
+            const bjórRev = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
+            const sterktRev = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
+            const vínRev = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
+            const totalRevenue = bjórRev + sterktRev + vínRev;
+
+            // Retained Earnings (Cash in hand after paying everyone)
+            // Logic: Revenue - (Total Taxes Paid to Gov? No, that double counts).
+            // Better: Revenue - TotalCosts.
+            // Costs = Net Wages Paid to Staff + Rent Paid to Supplier + Taxes Paid to Gov (PAYE + VAT + Excise).
+            // Actually, simpler: 
+            // Cash In = Total Revenue.
+            // Cash Out = Net Wages (to staff) + Rent (to supplier) + All Taxes (to State/Muni).
+
+            // Net Wages to Staff = Gross Wages - (StateIncome + MunicipalTax).
+            // (Payroll Tax is paid by employer on top, but 'amount' in wages usually means Gross Salary. 
+            // Wait, does 'amount' include payroll tax? Usually "Launakostnaður" = Gross + Payroll. 
+            // Let's assume 'amount' is Gross Wages (Salary). Payroll Tax is calculated ON TOP.
+            // So Total Cost of Employment = Gross Wages + Payroll Tax.
+            // But 'Net Wages' received by employee = Gross Wages - Tax.
+            // The Event Holder pays: Gross Wages (to employee+gov) + Payroll Tax (to gov).
+            // So Event Holder Cost = Gross Wages + Payroll Tax.
+
+            // Total Cash Out = (Gross Wages + StatePayroll) + Gross Rent + Net VAT Payment + Alcohol Excise.
+            // Wait, Net VAT Payment is part of the tax bill.
+            // Rent VSK is Input VAT. Alcohol VSK is Output VAT.
+            // Payment to Gov = OutputVAT - InputVAT + Excise + PAYE + Payroll.
+            // Payment to Landlord = Rent (ex VAT) + RentVAT.
+            // Payment to Staff = Gross Wages - PAYE.
+            // THIS IS GETTING COMPLICATED.
+
+            // SIMPLER VIEW: Result = Revenue - Expenses - Taxes.
+            // Revenue = TotalRevenue.
+            // Expenses (Ex Taxes) = Gross Wages + Rent. (This assumes Wages 'amount' is the cost. If 'amount' is salary, cost is amount + payroll).
+            // Let's settle: 'amount' is Gross Salary.
+            // Operating Cost = Gross Wages + Rent (ex VAT). 
+            // Taxes = PAYE (deducted from wages, so not an *extra* cost to company, but part of Gross).
+            // Payroll Tax = Extra cost.
+            // VAT = Net VAT paid.
+            // Excise = Extra cost.
+
+            // Total Cost = Gross Wages + (Gross Wages * TRYGGINGAGJALD) + Rent (ex VAT) + Net VAT + Alcohol Excise.
+            // Profit = Total Revenue (ex VAT) - (Gross Wages * 1.0635) - Rent (ex VAT) - Alcohol Excise.
+            // Wait, Revenue is Gross.
+
+            // Let's do "Cash Flow":
+            // In: TotalRevenue (Gross)
+            // Out:
+            //  - Net Wages (Gross - PAYE/Muni) -> To Staff
+            //  - Rent (Gross) -> To Supplier
+            //  - Taxes (GrandTotal: PAYE + Muni + Payroll + NetVAT + Excise) -> To Gov
+            // Balance = In - Out.
+
+            // Net Wages Calculation:
+            let totalNetWagesToStaff = 0;
+            Object.values(wages).forEach(row => {
+                const gross = row.amount;
+                // Tax deduction
+                const grossTax = gross * HEILD_STADGREIDSLA; // Assuming no personal allowance for simplicity
+                totalNetWagesToStaff += (gross - grossTax);
+            });
+
+            const cashOut = totalNetWagesToStaff + totalGrossRent + grandTotal;
+            const retainedEarnings = totalRevenue - cashOut;
+
+            // Ratios
+            let alcoholTaxRatioRevenue = 0;
+            if (totalRevenue > 0) {
+                alcoholTaxRatioRevenue = (alcoholExcise / totalRevenue) * 100;
+            }
+
+            let alcoholTaxRatioProfit = 0;
+            if (retainedEarnings > 0) {
+                alcoholTaxRatioProfit = (alcoholExcise / retainedEarnings) * 100;
+            } else {
+                alcoholTaxRatioProfit = 0; // or infinite
+            }
 
             // UPDATE UI
             document.getElementById('state-income').textContent = formatCurrency(stateIncome);
@@ -1177,6 +1271,43 @@
                 </div>
             `;
             document.getElementById('vat-breakdown').innerHTML = vatBreakdown;
+
+            // RETAINED EARNINGS SECTION (New)
+            const profitSection = `
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+                    <div class="result-line">
+                        <span>Eftir í sjóðnum:</span>
+                        <span class="result-value" style="color:#a7f3d0">${formatCurrency(retainedEarnings)}</span>
+                    </div>
+                    
+                    <div style="font-size:0.9rem; margin-top:15px; color:rgba(255,255,255,0.8);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom:5px;">
+                            <span>Áfengisgjald af veltu:</span>
+                            <strong>${alcoholTaxRatioRevenue.toFixed(1)}%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Áfengisgjald vs. Sjóður:</span>
+                            <strong>${retainedEarnings > 0 ? alcoholTaxRatioProfit.toFixed(1) + '%' : 'N/A'}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Append to Grand Total card (or create new UI element?)
+            // We can append to the 'grand-total' parent element if we had an ID, but let's just inject into the card logic.
+            // Since we are replacing the whole block, calculate() function is fine.
+            // But wait, the 'result-card total' HTML structure is fixed in the DOM, we only update innerText usually.
+            // We need to inject this new HTML dynamically.
+
+            // Let's check if the 'profit-section' already exists.
+            let profitDiv = document.getElementById('profit-section');
+            if (!profitDiv) {
+                const totalCard = document.querySelector('.result-card.total');
+                profitDiv = document.createElement('div');
+                profitDiv.id = 'profit-section';
+                totalCard.appendChild(profitDiv);
+            }
+            profitDiv.innerHTML = profitSection;
         }
 
         // ========================================
