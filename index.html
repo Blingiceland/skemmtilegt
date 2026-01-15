@@ -405,7 +405,7 @@
         }
 
         .row-wages {
-            grid-template-columns: 2fr 1fr 1fr auto;
+            grid-template-columns: 2fr 1fr auto;
         }
 
         .row-vat {
@@ -675,7 +675,6 @@
                     <ul>
                         <li>Rauntölur ráðast af skattkortum einstaklinga, öðrum tekjum og VSK-skilum.</li>
                         <li>VSK er sýndur sem <strong>nettó</strong> (útskattur mínus innskattur).</li>
-                        <li>Persónuafsláttur er einfaldaður - settu inn upphæð sem notuð er á hvern launalið.</li>
                         <li>Þetta er áætlun til viðmiðunar, ekki endanleg skattaútreikningur.</li>
                     </ul>
                 </div>
@@ -683,7 +682,9 @@
         </div>
 
         <div class="controls">
-            <button class="btn btn-primary" onclick="loadExample()">📋 Hlaða Dæmi</button>
+            <button class="btn btn-primary" onclick="loadScenario('dillon')">🎸 Gigg á Dillon</button>
+            <button class="btn btn-primary" onclick="loadScenario('stort')">🎭 Stórt Tónleikahald</button>
+            <button class="btn btn-primary" onclick="loadScenario('bar')">🍺 Bar Viðburður</button>
             <button class="btn btn-secondary" onclick="resetAll()">🔄 Hreinsa Allt</button>
         </div>
 
@@ -795,10 +796,10 @@
         // FIXED WAGE CATEGORIES
         // ========================================
         let wages = {
-            listafólk: { amount: 0, personalAllowance: 0 },
-            hljóðmaður: { amount: 0, personalAllowance: 0 },
-            starfsfólk: { amount: 0, personalAllowance: 0 },
-            þrif: { amount: 0, personalAllowance: 0 }
+            listafólk: { amount: 0 },
+            hljóðmaður: { amount: 0 },
+            starfsfólk: { amount: 0 },
+            þrif: { amount: 0 }
         };
 
         function renderWages() {
@@ -826,11 +827,6 @@
                         <label>Upphæð (kr)</label>
                         <input type="number" value="${row.amount}" 
                                onchange="updateWage('${cat.key}', 'amount', parseFloat(this.value) || 0)">
-                    </div>
-                    <div class="input-group">
-                        <label>Persónuafsláttur notaður (kr)</label>
-                        <input type="number" value="${row.personalAllowance}" 
-                               onchange="updateWage('${cat.key}', 'personalAllowance', parseFloat(this.value) || 0)">
                     </div>
                 `;
                 container.appendChild(div);
@@ -1082,13 +1078,12 @@
 
             Object.values(wages).forEach(row => {
                 const amount = row.amount;
-                const personalAllowance = row.personalAllowance;
 
-                // Gross tax before personal allowance
+                // Gross tax (no personal allowance)
                 const grossTax = amount * HEILD_STADGREIDSLA;
 
-                // Net tax after personal allowance (cannot go below 0)
-                const netTax = Math.max(0, grossTax - personalAllowance);
+                // Net tax is same as gross because no personal allowance
+                const netTax = grossTax;
 
                 // Ratios for splitting net tax
                 const municipalRatio = MEDAL_UTSVAR / HEILD_STADGREIDSLA;
@@ -1098,7 +1093,7 @@
                 const municipalFromWage = netTax * municipalRatio;
                 const stateIncomeFromWage = netTax * stateRatio;
 
-                // Payroll tax (always on full amount, no personal allowance)
+                // Payroll tax
                 const statePayrollFromWage = amount * TRYGGINGAGJALD;
 
                 municipalTax += municipalFromWage;
@@ -1182,18 +1177,53 @@
         // ========================================
         // EXAMPLE & RESET
         // ========================================
-        function loadExample() {
-            // Reset fixed structures
-            wages.listafólk = { amount: 600000, personalAllowance: 0 };
-            wages.hljóðmaður = { amount: 120000, personalAllowance: 0 };
-            wages.starfsfólk = { amount: 200000, personalAllowance: 0 };
-            wages.þrif = { amount: 0, personalAllowance: 0 };
+        function loadScenario(type) {
+            // Reset fixed structures first
+            resetDataStructures();
 
-            alcohol.bjór = { pints: 60, pricePerPint: 1200, abv: 4.5 };
-            alcohol.sterkt = { shots: 100, pricePerShot: 1500, abv: 40.0 };
-            alcohol.vín = { bottles: 10, pricePerBottle: 5000, abv: 12.5 };
+            if (type === 'dillon') {
+                // LITLA GIGGIÐ (DILLON)
+                // Band: 100k, Hljóð: 40k, Starfsfólk: 1 manneskja í 6kt (ca 25-30k), Þrif: 15k
+                wages.listafólk = { amount: 100000 };
+                wages.hljóðmaður = { amount: 40000 };
+                wages.starfsfólk = { amount: 30000 };
+                wages.þrif = { amount: 15000 };
 
-            vsk.leiga = { amount: 300000, vskRate: 0.24 };
+                // "2 30 litrar af bjór" = 60L = 120 pints
+                // "tæpar 2 flöskur af sterku" = ca 1.4-1.5L = ~50 shots
+                alcohol.bjór = { pints: 120, pricePerPint: 1300, abv: 4.5 };
+                alcohol.sterkt = { shots: 50, pricePerShot: 1600, abv: 40.0 };
+                alcohol.vín = { bottles: 0, pricePerBottle: 6000, abv: 12.5 };
+
+                // Engin leiga (staðurinn á græjur)
+                vsk.leiga = { amount: 0, vskRate: 0.24 };
+
+            } else if (type === 'stort') {
+                // STÓRA GIGGIÐ
+                wages.listafólk = { amount: 1500000 };
+                wages.hljóðmaður = { amount: 250000 };
+                wages.starfsfólk = { amount: 400000 };
+                wages.þrif = { amount: 100000 };
+
+                alcohol.bjór = { pints: 800, pricePerPint: 1400, abv: 5.0 };
+                alcohol.sterkt = { shots: 400, pricePerShot: 1800, abv: 40.0 };
+                alcohol.vín = { bottles: 60, pricePerBottle: 7500, abv: 13.0 };
+
+                vsk.leiga = { amount: 500000, vskRate: 0.24 };
+
+            } else if (type === 'bar') {
+                // BAR VIÐBURÐUR (DJ / Karaoke etc)
+                wages.listafólk = { amount: 50000 };
+                wages.hljóðmaður = { amount: 0 };
+                wages.starfsfólk = { amount: 150000 }; // Meira starfsfólk
+                wages.þrif = { amount: 40000 };
+
+                alcohol.bjór = { pints: 300, pricePerPint: 1200, abv: 4.5 };
+                alcohol.sterkt = { shots: 200, pricePerShot: 1500, abv: 40.0 };
+                alcohol.vín = { bottles: 10, pricePerBottle: 6500, abv: 12.5 };
+
+                vsk.leiga = { amount: 0, vskRate: 0.24 };
+            }
 
             renderWages();
             renderAlcohol();
@@ -1201,13 +1231,26 @@
             calculate();
         }
 
+        function resetDataStructures() {
+            wages.listafólk = { amount: 0 };
+            wages.hljóðmaður = { amount: 0 };
+            wages.starfsfólk = { amount: 0 };
+            wages.þrif = { amount: 0 };
+
+            alcohol.bjór = { pints: 0, pricePerPint: 0, abv: 4.5 };
+            alcohol.sterkt = { shots: 0, pricePerShot: 0, abv: 40.0 };
+            alcohol.vín = { bottles: 0, pricePerBottle: 0, abv: 12.5 };
+
+            vsk.leiga = { amount: 0, vskRate: 0.24 };
+        }
+
 
         function resetAll() {
             // Reset all fixed structures to zero
-            wages.listafólk = { amount: 0, personalAllowance: 0 };
-            wages.hljóðmaður = { amount: 0, personalAllowance: 0 };
-            wages.starfsfólk = { amount: 0, personalAllowance: 0 };
-            wages.þrif = { amount: 0, personalAllowance: 0 };
+            wages.listafólk = { amount: 0 };
+            wages.hljóðmaður = { amount: 0 };
+            wages.starfsfólk = { amount: 0 };
+            wages.þrif = { amount: 0 };
 
             alcohol.bjór = { pints: 0, pricePerPint: 0, abv: 4.5 };
             alcohol.sterkt = { shots: 0, pricePerShot: 0, abv: 40.0 };
