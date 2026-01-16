@@ -453,7 +453,8 @@
         const COD_FEE_RATE = 50.79; // kr/kg (Gross)
 
         // Update display
-        document.getElementById('cod-price-display').textContent = `${Math.round(COD_PRICE)} kr/kg`;
+        // Update display - REMOVED (Element missing)
+        // document.getElementById('cod-price-display').textContent = `${Math.round(COD_PRICE)} kr/kg`;
 
         // Alcohol
         const RATE_BEER = 156.45; // kr per cl of pure alcohol
@@ -485,6 +486,7 @@
         const fmt = (n) => new Intl.NumberFormat('is-IS').format(Math.round(n));
 
         // --- LOGIC ---
+        let isPintMode = false;
 
         function calculateNetFee(tonnes) {
             const kg = tonnes * 1000;
