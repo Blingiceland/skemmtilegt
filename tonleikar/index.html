@@ -783,6 +783,12 @@
                     <span>Samtals velta (m. VSK):</span>
                     <span class="result-value" id="total-revenue">0 kr</span>
                 </div>
+                <div style="font-size:0.85rem; padding-left:10px; opacity:0.8; margin-bottom:15px;">
+                    <div style="display: flex; justify-content: space-between; color: #f59e0b;">
+                        <span>- Vörukaup (30%):</span>
+                        <span id="cogs-display">0 kr</span>
+                    </div>
+                </div>
 
                 <!-- SKATTTEKJUR -->
                 <div class="result-line total-line" style="margin-top: 20px;">
@@ -953,10 +959,6 @@
             // 2. Markaðskostnaður (manual input, innskattur)
             renderVATRow(container, 'Markaðskostnaður', 'markadur');
 
-
-
-            // 2. Hljóðmaður (removed per user request - treated as wage earner)
-
             // 3. Matur & Drykkur (auto from alcohol sales, útskattur)
             const bjórRevenue = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
             const sterktRevenue = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
@@ -992,6 +994,38 @@
                 </div>
             `;
             container.appendChild(div);
+
+            // 4. Innskattur (COGS input VAT - calculated from alcohol sales)
+            const COGS_RATE = 0.30;
+            const totalCOGS = totalAlcoholRevenue * COGS_RATE;
+            const cogsBase = totalCOGS / 1.11; // Base without VAT
+            const cogsVAT = totalCOGS - cogsBase; // 11% VAT (this is the input VAT)
+
+            let cogsDiv = document.createElement('div');
+            cogsDiv.className = 'row row-vat';
+            cogsDiv.innerHTML = `
+                <div class="input-group">
+                    <label>Innskattur (11%)</label>
+                    <input type="text" value="Innskattur" disabled
+                           style="background: #fef3c7; cursor: not-allowed; font-weight: 600; color: #92400e;">
+                </div>
+                <div class="input-group">
+                    <label>Upphæð án VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(cogsBase)}" disabled
+                           style="background: #fef3c7; cursor: not-allowed; font-weight: 600; color: #92400e;">
+                </div>
+                <div class="input-group">
+                    <label>Innskattur (kr)</label>
+                    <input type="text" value="${formatCurrency(cogsVAT)}" disabled
+                           style="background: #fef3c7; cursor: not-allowed; font-weight: 600; color: #92400e;">
+                </div>
+                <div class="input-group">
+                    <label>Samtals með VSK (kr)</label>
+                    <input type="text" value="${formatCurrency(totalCOGS)}" disabled
+                           style="background: #fef3c7; cursor: not-allowed; font-weight: 600; color: #92400e;">
+                </div>
+            `;
+            container.appendChild(cogsDiv);
         }
 
         function renderVATRow(container, label, key) {
@@ -1187,6 +1221,39 @@
                 </div>
             `;
             container.appendChild(div);
+
+            // COGS ROW (Cost of Goods Sold)
+            const COGS_RATE = 0.30; // 30% of sales
+            const totalCOGS = totalRevenue * COGS_RATE;
+
+            div = document.createElement('div');
+            div.className = 'row row-alcohol';
+            div.style.marginTop = '10px';
+            div.innerHTML = `
+                <div class="input-group">
+                    <label style="font-weight: 600; font-size: 0.9rem;">Kostnaðarverð seldrar vöru</label>
+                    <input type="text" value="Vörukaup" disabled
+                           style="background: #fef3c7; cursor: not-allowed; font-weight: 600; color: #92400e; font-size: 0.9rem;">
+                </div>
+                <div class="input-group">
+                    <label style="font-size: 0.85rem; opacity: 0.7;">~30% af sölu</label>
+                    <input type="text" value="" disabled style="background: transparent; border: none;">
+                </div>
+                <div class="input-group">
+                    <label>&nbsp;</label>
+                    <input type="text" value="" disabled style="background: transparent; border: none;">
+                </div>
+                <div class="input-group">
+                    <label style="font-weight: 600; font-size: 0.9rem;">Kostnaður</label>
+                    <input type="text" value="${formatCurrency(totalCOGS)}" disabled
+                           style="background: #fef3c7; cursor: not-allowed; font-weight: 600; color: #92400e;">
+                </div>
+                <div class="input-group">
+                    <label style="font-size: 0.85rem; opacity: 0.7;">Miðað við Dillon</label>
+                    <input type="text" value="" disabled style="background: transparent; border: none;">
+                </div>
+            `;
+            container.appendChild(div);
         }
 
         function updateAlcohol(key, field, value) {
@@ -1231,9 +1298,21 @@
                 statePayroll += statePayrollFromWage;
             });
 
+            // Calculate alcohol revenue FIRST (needed for VSK and COGS calculations)
+            const bjórRev = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
+            const sterktRev = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
+            const vínRev = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
+            const alcoholRevenue = bjórRev + sterktRev + vínRev;
+
             // B) VSK
             let outputVAT = 0;
             let inputVAT = 0;
+
+            // 0. Vörukaup (innskattur) - COGS includes 11% VAT
+            const COGS_RATE = 0.30;
+            const totalCOGS = alcoholRevenue * COGS_RATE;
+            const cogsInputVAT = totalCOGS * (11 / 111);
+            inputVAT += cogsInputVAT;
 
             // 1. Leiga á búnaði (innskattur)
             inputVAT += vsk.leiga.amount * vsk.leiga.vskRate;
@@ -1300,12 +1379,6 @@
 
             const totalGrossRent = vsk.leiga.amount * (1 + vsk.leiga.vskRate);
             const totalGrossMarketing = vsk.markadur.amount * (1 + vsk.markadur.vskRate);
-
-            // Alcohol Revenue (Gross, includes 11% VSK)
-            const bjórRev = alcohol.bjór.pints * alcohol.bjór.pricePerPint;
-            const sterktRev = alcohol.sterkt.shots * alcohol.sterkt.pricePerShot;
-            const vínRev = alcohol.vín.bottles * alcohol.vín.pricePerBottle;
-            const alcoholRevenue = bjórRev + sterktRev + vínRev;
 
             // Net Ticket Revenue (after artist payment)
             const netTicketRevenue = ticketSales - artistPayment;
@@ -1398,6 +1471,9 @@
             document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
             document.getElementById('grand-total').textContent = formatCurrency(grandTotal);
 
+            // COGS display (already calculated in VSK section)
+            document.getElementById('cogs-display').textContent = formatCurrency(totalCOGS);
+
             // Detailed Tax Breakdown
             const taxBreakdownHTML = `
                 <div style="display: flex; justify-content: space-between;"><span>VSK (nettó):</span> <span>${formatCurrency(netVAT)}</span></div>
@@ -1414,6 +1490,11 @@
                     <strong>Sundurliðun VSK:</strong><br>
                     <div style="display: flex; justify-content: space-between;"><span>Útskattur (sala):</span> <span>${formatCurrency(outputVAT)}</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>Innskattur (aðföng):</span> <span>-${formatCurrency(inputVAT)}</span></div>
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb; font-size: 0.85em; opacity: 0.8;">
+                        <div style="display: flex; justify-content: space-between;"><span>• Vörukaup:</span> <span>-${formatCurrency(cogsInputVAT)}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>• Leiga:</span> <span>-${formatCurrency(vsk.leiga.amount * vsk.leiga.vskRate)}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>• Markaðskostnaður:</span> <span>-${formatCurrency(vsk.markadur.amount * vsk.markadur.vskRate)}</span></div>
+                    </div>
                 </div>
             `;
             document.getElementById('vat-breakdown').innerHTML = vatBreakdown;
@@ -1431,13 +1512,13 @@
             resetDataStructures();
 
             if (type === 'dillon') {
-                setWage('listafolk', 100000);
+                setWage('listafolk', 75000);
                 setWage('hljóðmaður', 40000);
                 setWage('starfsfólk', 30000);
                 setWage('þrif', 15000);
                 setWage('oryggisgaesla', 20000);
 
-                ticketSales = 150000; // Small venue ticket sales
+                ticketSales = 75000; // Small venue ticket sales
                 document.getElementById('ticket-sales').value = ticketSales;
 
                 alcohol.bjór = { pints: 80, pricePerPint: 1500, abv: 4.5 };
