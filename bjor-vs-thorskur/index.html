@@ -348,6 +348,91 @@
                 transform: rotate(10deg);
             }
         }
+
+        /* TOGGLE SWITCH */
+        .toggle-container {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 2px solid #333;
+        }
+
+        .toggle-label {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #333;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #ea580c;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        /* ASSUMPTIONS BOX */
+        .assumptions-box {
+            position: absolute;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 25;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 20px 30px;
+            max-width: 500px;
+            color: #fff;
+        }
+
+        .assumptions-title {
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #22c55e;
+            text-align: center;
+        }
+
+        .assumption-item {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .assumption-label {
+            color: #ea580c;
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -359,6 +444,27 @@
     <div class="revenue-pill">
         <span class="revenue-label">Ríkið fær:</span>
         <span id="state-revenue">0 kr.</span>
+    </div>
+
+    <!-- TOGGLE SWITCH -->
+    <div class="toggle-container">
+        <span class="toggle-label">30L Kútar</span>
+        <div class="toggle-switch" id="toggle" onclick="toggleMode()">
+            <div class="toggle-slider"></div>
+        </div>
+        <span class="toggle-label">Per Pint (1500kr)</span>
+    </div>
+
+    <!-- ASSUMPTIONS BOX -->
+    <div class="assumptions-box">
+        <div class="assumptions-title">📋 Forsendur</div>
+        <div class="assumption-item">
+            <span class="assumption-label">Bjór:</span> 30L kútar, hálfur líter (pint) kostar 1.500 kr
+        </div>
+        <div class="assumption-item">
+            <span class="assumption-label">Þorskur:</span> Aflaverðmæti reiknað á <span id="cod-price-display">405
+                kr/kg</span>
+        </div>
     </div>
 
     <!-- CENTRAL BADGE -->
@@ -441,6 +547,9 @@
         const COD_PRICE = 405.15; // kr/kg
         const COD_FEE_RATE = 50.79; // kr/kg (Gross)
 
+        // Update display
+        document.getElementById('cod-price-display').textContent = `${Math.round(COD_PRICE)} kr/kg`;
+
         // Alcohol
         const RATE_BEER = 156.45; // kr per cl of pure alcohol
         const KEG_LITERS = 30;
@@ -466,7 +575,29 @@
 
         const elStateRevenue = document.getElementById('state-revenue');
 
-        // --- FORMATTER ---
+        // --- MODE TOGGLE ---
+        let isPintMode = false; // false = 30L kegs, true = per pint
+
+        function toggleMode() {
+            isPintMode = !isPintMode;
+            const toggle = document.getElementById('toggle');
+            const label = document.querySelector('.side-bar label');
+
+            if (isPintMode) {
+                toggle.classList.add('active');
+                label.textContent = 'Selur þetta marga Pinta (1500 kr)';
+            } else {
+                toggle.classList.remove('active');
+                label.textContent = 'Selur þetta marga Bjórkúta (30L)';
+            }
+
+            // Recalculate
+            const inputVal = parseFloat(elKegs.value) || 0;
+            updateBarStats(inputVal);
+            updateBoatFromBar();
+        }
+
+        // --- HELPERS ---
         const fmt = (n) => new Intl.NumberFormat('is-IS').format(Math.round(n));
 
         // --- LOGIC ---
@@ -506,9 +637,24 @@
             return found;
         }
 
-        function updateBarStats(kegs) {
-            const sales = kegs * SALES_PER_KEG;
-            const tax = kegs * KEG_TAX_PER_KEG;
+        function updateBarStats(input) {
+            let sales, tax;
+
+            if (isPintMode) {
+                // Input is number of pints
+                const pints = input;
+                sales = pints * RETAIL_PRICE_PER_PINT;
+
+                // Calculate tax: each pint is 0.5L at 5% ABV
+                const liters = pints * 0.5;
+                const pureAlcoholCL = liters * KEG_ABV;
+                tax = pureAlcoholCL * RATE_BEER;
+            } else {
+                // Input is number of 30L kegs
+                const kegs = input;
+                sales = kegs * SALES_PER_KEG;
+                tax = kegs * KEG_TAX_PER_KEG;
+            }
 
             elBarSales.textContent = fmt(sales) + ' kr.';
             elBarTax.textContent = fmt(tax) + ' kr.';
