@@ -36,6 +36,19 @@ export default function Kynning() {
           aðeins til ef viðburðurinn er haldinn. Þetta er fjárfesting með reiknanlegri ávöxtun, ekki útgjöld.
         </p>
 
+        <h3>Skattaeftirlitið græðir líka</h3>
+        <p>
+          Til að fá endurgreiðslu þarf haldari að leggja fram raunbókhald: alla reikninga, launaskýrslur,
+          afdráttarskil erlendra listamanna, áfengisuppgjör. Kerfið krefst skjölunar sem stenst skoðun
+          Skattsins — annars engin endurgreiðsla.
+        </p>
+        <p>
+          Þetta er ekki aukabyrði. Þetta er hreinsun. Sá hluti menningargeirans sem hefur lifað í gráma
+          — staðgreiðslur í umslögum, sviðsmenn án samninga, miðasala án skila — fær fjárhagslega ástæðu til
+          að færa sig yfir í formlega hagkerfið. Skatturinn fær betri gögn, færri svartholin, og þrengri
+          glufur. Endurgreiðslukerfi er um leið eftirlitskerfi.
+        </p>
+
         <h3>Hvers vegna ég</h3>
         <p>
           Ég er bæði viðburðahaldari og skattalögfræðingur. Ég veit nákvæmlega hvernig hver einasta króna fer í

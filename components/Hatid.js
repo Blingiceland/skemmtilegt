@@ -217,6 +217,10 @@ export default function Hatid() {
               <KrInput value={s.insurance} onChange={set('insurance')} />
             </Field>
           </div>
+          <div className="subtotal">
+            <span>Samtals aðkeypt þjónusta</span>
+            <span>{fmt(num(s.setup) + num(s.teardown) + num(s.soundLights) + num(s.security) + num(s.infra) + num(s.siteRent) + num(s.marketing) + num(s.insurance))}</span>
+          </div>
 
           <div className="group-title">Ferðamannafótspor (utan svæðis)</div>
           <Field label="Gisting erlendra gesta utan hátíðar" hint="(hótel, gistihús — 11% VSK)">
@@ -348,6 +352,9 @@ export default function Hatid() {
         h2 { font-family: 'Archivo', sans-serif; font-size: 1.5rem; font-weight: 900; margin-bottom: 4px; }
         .sub { font-size: 0.82rem; color: #6a5a48; margin-bottom: 22px; }
         .group-title { font-family: 'Archivo'; font-weight: 800; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blood-deep); margin: 26px 0 12px; padding-bottom: 6px; border-bottom: 1.5px dashed var(--line); }
+        .subtotal { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding: 10px 14px; background: var(--paper); border-left: 3px solid var(--gold); border-radius: 2px; font-family: 'Archivo'; }
+        .subtotal > span:first-child { font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #5a4a38; }
+        .subtotal > span:last-child { font-weight: 900; font-size: 1.05rem; color: var(--ink); font-variant-numeric: tabular-nums; }
         .optional { font-weight: 400; text-transform: none; letter-spacing: 0; color: #7a6a55; }
         .scenario-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
         .chip { font-family: 'Archivo'; font-weight: 600; font-size: 0.78rem; padding: 8px 16px; border: 1.5px solid var(--line); border-radius: 20px; cursor: pointer; background: var(--paper); transition: all 0.15s; }

@@ -21,8 +21,8 @@ function excise(litrar, abv, gjaldPerCl) {
   return Math.max(0, clVinandi - clThroskuldur) * gjaldPerCl;
 }
 
-const VENUE_2024 = {
-  mode: 'annual', alcoholTotal: '25000000', ticketSales: '0', lodging: '0',
+const DILLON = {
+  mode: 'event', alcoholTotal: '25000000', ticketSales: '0', lodging: '0',
   wages: '27402915', security: '0', sound: '0', rent: '0', marketing: '0',
   other24: '0', crew11: '0',
   grant: '', derived: '', cultPct: 85,
@@ -32,6 +32,12 @@ const STORT = {
   wages: '7700000', security: '450000', sound: '650000', rent: '1800000', marketing: '900000',
   other24: '4200000', crew11: '1800000',
   grant: '3000000', derived: '', cultPct: 85,
+};
+const ECLIPSE_2026 = {
+  mode: 'event', alcoholTotal: '125000000', ticketSales: '300000000', lodging: '100000000',
+  wages: '200000000', security: '55000000', sound: '40000000', rent: '0', marketing: '25000000',
+  other24: '125000000', crew11: '1800000',
+  grant: '', derived: '', cultPct: 85,
 };
 const EMPTY = {
   mode: 'event', alcoholTotal: '', ticketSales: '', lodging: '', wages: '',
@@ -168,8 +174,9 @@ Hlutur tónleikahaldara: ${fmt(r.organizerShare)}${
           <p className="sub">{s.mode === 'annual' ? 'Sláðu inn heildartölur ársins.' : 'Sláðu inn tölur eins kvölds.'}</p>
 
           <div className="scenario-chips no-print">
-            <div className="chip" onClick={() => load(VENUE_2024)}>⚡ Mín tónlistarhæð · 2024 (raun)</div>
+            <div className="chip" onClick={() => load(DILLON)}>🎵 Dillon Tónleikar</div>
             <div className="chip" onClick={() => load(STORT)}>🏟 Stórtónleikar (dæmi)</div>
+            <div className="chip" onClick={() => load(ECLIPSE_2026)}>🌒 Eclipse 2026</div>
             <div className="chip" onClick={() => load(EMPTY)}>↺ Hreinsa</div>
           </div>
 
