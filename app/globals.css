@@ -1,0 +1,29 @@
+:root {
+  --ink: #1a1410;
+  --paper: #f4ede0;
+  --paper-deep: #e8dcc8;
+  --blood: #c0392b;
+  --blood-deep: #7d1f15;
+  --gold: #c8962d;
+  --gold-soft: #e0b659;
+  --green: #2e6b4f;
+  --green-soft: #4a9b73;
+  --line: #2a201780;
+  --shadow: rgba(26, 20, 16, 0.18);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Archivo', sans-serif;
+  background: var(--paper);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(200, 150, 45, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 88% 92%, rgba(192, 57, 43, 0.05) 0%, transparent 45%);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
+@media print {
+  .no-print { display: none !important; }
+}
