@@ -22,8 +22,8 @@ function excise(litrar, abv, gjaldPerCl) {
 }
 
 const DILLON = {
-  mode: 'event', alcoholTotal: '25000000', ticketSales: '0', lodging: '0',
-  wages: '27402915', security: '0', sound: '0', rent: '0', marketing: '0',
+  mode: 'event', alcoholTotal: '200000', ticketSales: '0', lodging: '0',
+  wages: '75000', security: '25000', sound: '45000', rent: '0', marketing: '0',
   other24: '0', crew11: '0',
   grant: '', derived: '', cultPct: 85,
 };
@@ -36,8 +36,8 @@ const STORT = {
 const ECLIPSE_2026 = {
   mode: 'event', alcoholTotal: '125000000', ticketSales: '300000000', lodging: '100000000',
   wages: '200000000', security: '55000000', sound: '40000000', rent: '0', marketing: '25000000',
-  other24: '125000000', crew11: '1800000',
-  grant: '', derived: '', cultPct: 85,
+  other24: '130000000', crew11: '2000000',
+  grant: '', derived: '', cultPct: 90,
 };
 const EMPTY = {
   mode: 'event', alcoholTotal: '', ticketSales: '', lodging: '', wages: '',
