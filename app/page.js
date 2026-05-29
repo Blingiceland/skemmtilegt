@@ -2,6 +2,7 @@
 import '../app/globals.css';
 import Reiknivel from '../components/Reiknivel';
 import Kynning from '../components/Kynning';
+import Greinargerd from '../components/Greinargerd';
 
 export default function Page() {
   return (
@@ -10,6 +11,7 @@ export default function Page() {
         <Reiknivel />
       </div>
       <Kynning />
+      <Greinargerd />
     </main>
   );
 }
